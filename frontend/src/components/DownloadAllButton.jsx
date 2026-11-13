@@ -1,0 +1,52 @@
+import React, { useState } from 'react';
+import { Download, Loader2 } from 'lucide-react';
+import { downloadAllActs } from '../services/api';
+
+const DownloadAllButton = ({ taskId }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!taskId) return;
+    setIsDownloading(true);
+    try {
+      const blob = await downloadAllActs(taskId);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `document_intelligence_acts_${taskId}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Ошибка при скачивании файлов:', error);
+      alert('Ошибка при скачивании файлов. Попробуйте еще раз.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={isDownloading || !taskId}
+      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+      title="Скачать все акты с упоминанием (ZIP)"
+    >
+      {isDownloading ? (
+        <>
+          <Loader2 className="animate-spin" size={18} />
+          Скачивание...
+        </>
+      ) : (
+        <>
+          <Download size={18} />
+          Скачать все файлы
+        </>
+      )}
+    </button>
+  );
+};
+
+export default DownloadAllButton;
+

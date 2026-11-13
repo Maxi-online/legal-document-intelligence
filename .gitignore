@@ -1,0 +1,142 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Settings file with API keys
+settings.json
+settings.json.enc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# React
+frontend/build/
+frontend/dist/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Database
+*.db
+*.sqlite
+
+# Exports
+exports/
+*.xlsx
+*.pdf
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Private runtime configuration
+.env
+.env.*
+!.env.example
+!.env.template
+settings.json
+settings.*.json
+!settings.example.json
+!settings.json.example
+settings_secret.json
+!settings_secret.example.json
+*.local.json
+*.local.yaml
+*.local.yml
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Private datasets, exports and encrypted production configuration
+*.log
+.tmplogs/
+logs/
+*.sqlite
+*.sqlite3
+*.dump
+*.json.enc
+**/caddy_data/
+**/certs/
+full_resume_*.json
+!examples/**
+
+# Publication boundary: local state and private data
+.venv/
+__pycache__/
+.pytest_cache/
+node_modules/
+.env
+.env.*
+!.env.example
+!.env.template
+settings.json
+settings.*.json
+!settings.example.json
+!settings.json.example
+config.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.enc
+*.log
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.zip
+*.7z
+*.pcd
+*.bag
+*.onnx
+*.pt
+*.pth
+outputs/
+exports/
+logs/

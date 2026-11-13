@@ -1,0 +1,40 @@
+{
+  "openai": {
+    "api_key": "${OPENAI_API_KEY}"
+  },
+  "casebook": {
+    "username": "${CASEBOOK_USERNAME}",
+    "password": "${CASEBOOK_PASSWORD}",
+    "api_key": "${CASEBOOK_API_KEY}",
+    "base_url": "${CASEBOOK_BASE_URL}"
+  },
+  "database": {
+    "postgres": {
+      "host": "${DATABASE_POSTGRES_HOST}",
+      "port": 5432,
+      "user": "${DATABASE_POSTGRES_USER}",
+      "password": "${DATABASE_POSTGRES_PASSWORD}",
+      "db": "document_intelligence_db",
+      "sslmode": "disable"
+    }
+  },
+  "network": {
+    "nginx": {
+      "domain": "localhost"
+    },
+    "proxy": {
+      "enabled": false,
+      "http": "",
+      "https": "",
+      "socks5": "",
+      "no_proxy": "localhost,127.0.0.1,::1,api_gateway,redis,postgres"
+    }
+  },
+  "auth": {
+    "jwt": {
+      "secret": "${AUTH_JWT_SECRET}",
+      "access_token_ttl_minutes": 60
+    },
+    "users": []
+  }
+}
