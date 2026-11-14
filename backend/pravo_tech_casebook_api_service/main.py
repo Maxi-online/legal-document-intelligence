@@ -8,7 +8,7 @@ from fastapi.responses import Response
 
 app = FastAPI(title="Casebook API Service", version="1.0.0")
 
-pravo_service = PravoTechService()  # Сервис для работы с Casebook API 3.0
+pravo_service = PravoTechService()  # Service for Casebook API 3.0
 
 class SearchRequest(BaseModel):
     query: str
@@ -21,46 +21,46 @@ class SearchResponse(BaseModel):
 @app.get("/api/acts/{act_id}/download")
 async def download_act(act_id: str):
     """
-    Скачивание файла акта через Casebook API 3.0.
-    В production версии должен быть реализован реальный запрос к API для получения документа.
+    downloading the act file through the Casebook API 3.0.
+    In the production version, a real request for an API to receive a document must be implemented.
     """
-    # TODO: Реализовать реальный запрос к Casebook API 3.0 для скачивания документа
+    # TODO: Implement a real request for the Casebook API 3.0 for downloading document
     raise HTTPException(
         status_code=501,
-        detail="Скачивание файлов актов через Casebook API 3.0 еще не реализовано"
+        detail='The downloading of act files through the Casebook API 3.0 has not yet been implemented'
     )
 
 @app.post("/api/search")
 async def search(request: SearchRequest):
     """
-    Поиск судебных актов через Casebook API 3.0.
-    Требует наличия учетных данных (username/password или api_key) в settings.json.
+    Searching for court acts through Casebook API 3.0.
+    Requires accounting data (username/password or api_key) in settings.json.
     """
     try:
-        print(f"[API_SEARCH] Запрос поиска: query={request.query}, search_type={request.search_type}")
-        # Используем реальный API Casebook 3.0
+        print(f"[API_SEARCH] Search request: query={request.query}, search_type={request.search_type}")
+        # Use real API Casebook 3.0
         results = await pravo_service.search_cases(
             query=request.query,
             search_type=request.search_type
         )
         
-        print(f"[API_SEARCH] Получено результатов: {len(results)}")
+        print(f"[API_SEARCH] Results obtained: {len(results)}")
         if results:
             first_result = results[0]
-            print(f"[API_SEARCH] Первый результат: case_number={first_result.get('case_number')}, act_text присутствует={bool(first_result.get('act_text'))}, act_text длина={len(first_result.get('act_text', '')) if first_result.get('act_text') else 0}")
+            print(f"[API_SEARCH] First result: case_number={first_result.get('case_number')}, act_text present={bool(first_result.get('act_text'))}, act_text length={len(first_result.get('act_text', '')) if first_result.get('act_text') else 0}")
         
         return {
             "results": results,
             "total": len(results)
         }
     except HTTPException:
-        # Пробрасываем HTTPException как есть (уже содержит правильный статус и детали)
+        # Throw HTTPException as it is (already contains the correct status and details))
         raise
     except Exception as e:
-        # Обрабатываем все остальные ошибки
+        # Processing all other errors
         raise HTTPException(
             status_code=500,
-            detail=f"Внутренняя ошибка при поиске через Casebook API 3.0: {str(e)}"
+            detail=f"Internal error when searching through Casebook API 3.0: {str(e)}"
         )
 
 class EnrichRequest(BaseModel):
@@ -69,9 +69,9 @@ class EnrichRequest(BaseModel):
 
 @app.post("/api/enrich")
 async def enrich_document(request: EnrichRequest):
-    """Загрузка полного текста документа для обогащения результатов из кэша"""
+    'Loading the full text of the document to enrich the cache results'
     try:
-        # Используем внутренний метод _enrich_with_document_texts через временный список
+        # Use the internal method _enrich_with_document_texts through the interim list
         temp_results = [{
             "metadata": {
                 "case_id": request.case_id,
@@ -86,7 +86,7 @@ async def enrich_document(request: EnrichRequest):
 
 @app.get("/health")
 async def health():
-    """Проверка здоровья сервиса"""
+    'Service health check'
     return {"status": "healthy", "service": "pravo_tech_casebook_api_service"}
 
 if __name__ == "__main__":

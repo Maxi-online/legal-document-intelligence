@@ -1,105 +1,105 @@
-# Анализ соответствия ТЗ
+# Conformity analysis of TK
 
-## ✅ Реализовано полностью
+## ✅ Fully implemented
 
-### 1. Функциональные требования
+### 1. Functional requirements
 
-#### 3.1. Вводные данные пользователя
-- ✅ Поиск по ФИО физического лица
-- ✅ Поиск по ИНН юридического лица
-- ✅ Поиск по наименованию юридического лица
-- ✅ Поддержка нескольких запросов через запятую - **РЕАЛИЗОВАНО**
+#### 3.1. Introductory user data
+- ✅ Search for a natural person by FIO
+- ✅ Search for a legal person under the INS
+- ✅ Search for the name of a legal person
+- ✅ Support for multiple requests through a comma - ** REALISED**
 
-#### 3.2. Поиск и сбор данных
-- ✅ Интеграция с API (Casebook API вместо Право.ру API)
-- ✅ Полнотекстовый поиск
-- ✅ Извлечение метаданных:
-  - ✅ номер дела
-  - ✅ дата акта
-  - ✅ наименование суда
-  - ✅ стороны по делу
-  - ✅ ссылка на полный текст акта (URL)
-  - ✅ фрагмент текста (контекст)
-  - ✅ тип упоминания (добавлено в БД)
-- ✅ Фильтрация дубликатов по номеру дела (добавлено)
-- ✅ Дедупликация по акту (`act_url`) (чтобы не терять несколько актов одного дела)
+#### 3.2. Search and data collection
+- ✅ Integration with API (Casebook API instead of Law.ru API))
+- ✅ Full text search
+- ✅ Extraction of metadata:
+  - ✅ Case number
+  - ✅ Date of act
+  - ✅ Name of vessel
+  - ✅ parties in the case
+  - ✅ reference to the full text of the act (URL))
+  - ✅ A part of the text (context))
+  - ✅ Type of reference (added to database))
+- ✅ Duplicate filtering by case number (added))
+- ✅ Depodulation by act (`act_url`) (to avoid losing several acts of one case))
 
-#### 3.3. Постобработка и ранжирование
-- ✅ Сортировка по дате (новые выше) - исправлено
-- ✅ Сортировка по релевантности
-- ✅ Обработка через LLM (top‑N):
-  - ✅ Извлечение контекста
-  - ✅ Классификация типа упоминания
-  - ✅ Ранжирование: BM25 + embeddings + эвристики; LLM только для top‑N
+#### 3.3. Post-treatment and ranking
+- ✅ Date Sorting (new above) - corrected
+- ✅ Sorting by Relevance
+- ✅ LLM processing (top –N)):
+  - ✅ Extraction of context
+  - ✅ Classification of the type of reference
+  - ✅ Ran: BM25 + embeddings + heuristics; LLM only for top –N
 
-#### 3.4. Вывод пользователю
-- ✅ Таблица результатов
-- ✅ Подсчет найденных упоминаний - добавлено
-- ✅ Подсчет уникальных дел - добавлено
-- ✅ Все требуемые поля в таблице
-- ✅ Дата загрузки в БД (`ingested_at`) для оценки “свежести” данных
+#### 3.4. User output
+- ✅ Results framework
+- ✅ Counting of references found - added
+- ✅ Counting of unique cases - added
+- ✅ All required fields in the table
+- ✅ Date of download to database (`ingested_at`) to assess
 
-#### 3.5. Экспорт
-- ✅ Экспорт в Excel (.xlsx)
-- ✅ Экспорт в PDF
-- ✅ Экспорт в JSON
-- ✅ Кликабельные ссылки на акты в Excel/PDF
-- ✅ В экспорт добавлена дата загрузки
+#### 3.5. Exports
+- ✅ Export to Excel (.xlsx))
+- ✅ Export to PDF
+- ✅ Exports to JSON
+- ✅ Qualified references to acts in Excel/PDF
+- ✅ Added download date to export
 
-### 2. Архитектура и стек
+### 2. Architecture and Walls
 - ✅ Python 3.11+
 - ✅ FastAPI
-- ✅ httpx для запросов к API
-- ✅ PostgreSQL для хранения
-- ✅ React + TailwindCSS для фронтенда
-- ✅ openpyxl для Excel
-- ✅ reportlab для PDF
-- ✅ Redis для кэширования
-- ✅ Celery для асинхронной обработки
+- ✅ httpx for APl requests
+- ✅ PostgreSQL for storage
+- ✅ React + TailwindCSS for frontend
+- ✅ Openpyxl for Excel
+- ✅ Reportlab for PDF
+- ✅ Redis for cache
+- ✅ Celery for Asynchronous Processing
 
-### 3. База данных
-- ✅ Модель Case с полями:
-  - ✅ case_number (номер дела)
-  - ✅ court (суд)
-  - ✅ date (дата акта)
-  - ✅ act_url (ссылка на акт)
-  - ✅ parties (стороны)
-  - ✅ act_text (текст акта)
-  - ✅ act_type (тип акта)
-  - ✅ context (контекст упоминания)
-  - ✅ **type_of_mention (тип упоминания из API)** - ДОБАВЛЕНО
-  - ✅ classification (классификация от GPT)
-  - ✅ relevance_score (оценка релевантности)
-  - ✅ extraction_confidence (уверенность извлечения)
-  - ✅ metadata (дополнительные данные)
+### 3. Database
+- ✅ Case with Fields:
+  - ✅ case_number (case number))
+  - ✅ Court)
+  - ✅ Date of act)
+  - ✅ act_url (reference to act))
+  - ✅ Parties)
+  - ✅ act_text (text of act)
+  - ✅ act_type (type of act))
+  - ✅ CONTEXT (context of reference to)
+  - ✅ **type_of_mention (type of reference from API)** - APPENDIX
+  - ✅ classification from GPT)
+  - ✅ relevance_score (appraising relevance)
+  - ✅ extraction_confidence (trust confidence))
+  - ✅ metadata (additional data))
 
-## ⚠️ Частично реализовано
+## ⚠️ Partially implemented
 
-### 1. UI/UX требования (п.7)
-- ✅ Поле ввода ФИО / ИНН / Название
-- ✅ Кнопка «Найти»
-- ✅ Таблица результатов с фильтрами
-- ✅ Просмотр фрагмента акта
-- ✅ Кнопка «Экспорт»
-- ✅ Подсветка ФИО/ИНН в контексте - **РЕАЛИЗОВАНО**
-- ✅ Кнопка «скачать все файлы с упоминанием» (ZIP) - **РЕАЛИЗОВАНО (в моковом режиме и через proxy)**
+### 1. UI/UX requirements (P.7)
+- ✅ FIE / INS / Name
+- ✅ Find button»
+- ✅ Filter results table
+- ✅ View the piece of the act
+- ✅ Export button»
+- ✅ FIO/INN coverage in the context of - ** REALIZATION**
+- ✅ "Slip All Reference Files" button (ZIP) - ** REALIZED (in wet mode and via proxie))**
 
-### 2. Нефункциональные требования (п.6)
-- ✅ Кэширование через Redis
-- ⚠️ Время отклика: зависит от API и обработки GPT
-- ⚠️ Логирование: базовая реализация, можно улучшить
-- ✅ Безопасность: шифрование `settings.json.enc`, JWT‑авторизация, статусы задач в Redis
+### 2. Non-functional requirements (P.6))
+- ✅ Cashing through Redis
+- ⚠️ Response time: Depends on API and GPT processing
+- ⚠️ Logging: basic implementation, can be improved
+- ✅ Security: encryption of `settings.json.enc`, JWT – authorisation, status of task in Redis
 
-## ❌ Не реализовано
+## ❌ Not implemented
 
-1. **Полная интеграция именно с API Право.ру** (вместо Casebook/PravoTech адаптера)
-   - Сейчас используется Casebook API Service + моковый режим; для 100% соответствия нужен контракт/эндпоинты Право.ру
+1. **Full integration with API Right.ru** (instead of Casebook/PravoTech adapter))
+   - The Casebook API Service + wet mode is now used; 100% compliance requires contract/endpoints Right
 
-2. **Скачивание “оригинальных” файлов актов из реального API**
-   - В моковом режиме скачивание реализовано (ZIP + proxy), для реального API нужны правила авторизации/формат выдачи файлов
+2. **downloading the originals from the real API**
+   - In Mood mode, the download is implemented (ZIP + proxy), the real API requires the authorization/file release formats
 
-## Резюме
+## Executive summary
 
-**Соответствие ТЗ: ~95% (для мокового режима/Casebook интеграции)**
+**Compliance of TK: ~95 per cent (for wet mode / Integration Casebook))**
 
-Основная функциональность реализована. Остались пункты, завязанные на конкретный реальный API Право.ру (контракт поиска/скачивания) и “production hardening” (наблюдаемость/алерты/миграции БД).
+Main functionality implemented. The remaining points are bound to the specific real API of Prav.ru (search/download contract) and “production hardening” (observability/allerts/migration of BD).

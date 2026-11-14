@@ -1,6 +1,6 @@
 """
-Модуль с фейковыми данными для тестирования системы
-Используется для тестирования агентов обработки и настройки других модулей
+Fake data module for system testing
+Used to test processing agents and settings of other modules
 """
 
 from typing import List, Dict
@@ -26,26 +26,26 @@ def _query_variants(query: str, search_type: str) -> List[str]:
         digits = re.sub(r"\D+", "", q)
         if not digits:
             return [q]
-        # варианты форматирования ИНН
+        # OSI formatting options
         spaced = " ".join([digits[i:i+3] for i in range(0, len(digits), 3)])
-        return [digits, f"ИНН {digits}", f"ИНН: {digits}", spaced, f"ИНН {spaced}"]
+        return [digits, f"INN {digits}", f"INN: {digits}", spaced, f"INN {spaced}"]
 
-    # fio/company — варианты написания
+    # fio/company is a writing version
     variants = [q]
-    # кавычки для ООО
+    # Quantities for GS
     variants.append(q.replace('"', '«').replace('"', '»'))
     variants.append(q.replace("ООО", "Общество с ограниченной ответственностью"))
     variants.append(q.replace("Общество с ограниченной ответственностью", "ООО"))
-    # сокращения ФИО
+    # FIO reduction
     parts = q.split()
     if len(parts) >= 2:
         variants.append(f"{parts[0]} {parts[1][0]}.")
     if len(parts) >= 3:
         variants.append(f"{parts[0]} {parts[1][0]}.{parts[2][0]}.")
-    # лёгкая “опечатка”
+    # Easy typing
     if len(q) > 6:
         variants.append(q[:-1])
-    # уникализируем
+    # deduplicate
     out = []
     for v in variants:
         if v and v not in out:
@@ -56,53 +56,53 @@ from typing import Optional
 
 def generate_mock_casebook_response(query: str, search_type: str = "fio", count: int = 10, rng: Optional[random.Random] = None, reference_time: Optional[datetime] = None) -> Dict:
     """
-    Генерация фейкового ответа от Casebook API для тестирования
+    Fake response generation from Casebook API for testing
     
     Args:
-        query: Поисковый запрос (ФИО, ИНН, наименование)
-        search_type: Тип поиска ("fio", "inn", "company")
-        count: Количество результатов для генерации
+        query: Search request (FIO, INN, name)
+        search_type: Search type ("fio", "inn", "company")
+        count: Number of results for generation
     
     Returns:
-        Словарь с структурой ответа Casebook API
+        A dictionary with response structure Casebook API
     """
     rng = rng or random
     reference_time = reference_time or datetime.now()
 
     courts = [
-        "Арбитражный суд города Москвы",
-        "Арбитражный суд Московской области",
-        "Арбитражный суд города Санкт-Петербурга и Ленинградской области",
-        "Арбитражный суд Московского округа",
-        "Арбитражный суд Центрального округа",
-        "Арбитражный суд Северо-Западного округа",
-        "Арбитражный суд Поволжского округа",
-        "Арбитражный суд Уральского округа",
-        "Арбитражный суд Сибирского округа",
-        "Арбитражный суд Дальневосточного округа",
+        'Court of Arbitration of Moscow',
+        'Court of Arbitration of Moscow Region',
+        'Court of Arbitration of St. Petersburg and Leningrad Region',
+        'Court of Arbitration of the Moscow District',
+        'Central District Court of Arbitration',
+        'Court of Arbitration of the Northwest District',
+        'Court of Arbitration of the Volj District',
+        'Court of Arbitration of the Ural District',
+        'Court of Arbitration of the Siberian District',
+        'Far East District Court of Arbitration',
     ]
     
     regions = [
-        "Москва", "Московская область", "Санкт-Петербург", "Ленинградская область",
-        "Новосибирская область", "Екатеринбург", "Нижний Новгород", "Казань",
-        "Краснодарский край", "Пермский край"
+        'Moscow', 'Moscow Region', 'Saint Petersburg', 'Leningrad region',
+        'Novosibir region', 'Catherineburg', 'Lower Novgorod', 'Kazan',
+        'Krasnodar region', 'Perm Province'
     ]
     
-    act_types = ["Решение", "Определение", "Постановление", "Приказ"]
+    act_types = ['Decision', 'Definition', 'Regulation', 'Order']
     
-    mention_types = ["истец", "ответчик", "участник", "контрагент", "третье лицо", "упоминание"]
+    mention_types = ["истец", "ответчик", "участник", "контрагент", "третье лицо", 'Reference']
 
     q_variants = _query_variants(query, search_type)
     
     items = []
     
     for i in range(count):
-        # Генерируем случайную дату в последние 3 года
+        # Generate a random date in the last 3 years
         days_ago = rng.randint(0, 1095)
         case_date = (reference_time - timedelta(days=days_ago)).strftime("%Y-%m-%d")
         
-        # Генерируем номер дела
-        case_number = f"А{rng.randint(40, 75)}-{rng.randint(10000, 99999)}/{2021 + rng.randint(0, 3)}"
+        # Generate case number.
+        case_number = f"A{rng.randint(40, 75)}-{rng.randint(10000, 99999)}/{2021 + rng.randint(0, 3)}"
         
         court = rng.choice(courts)
         region = rng.choice(regions)
@@ -113,35 +113,35 @@ def generate_mock_casebook_response(query: str, search_type: str = "fio", count:
         qv2 = rng.choice(q_variants)
         qv3 = rng.choice(q_variants)
         
-        # Генерируем контекст в зависимости от типа упоминания
+        # Generate context depending on the type of reference
         if mention_type == "истец":
-            context_text = f"Установлено, что {qv1} обратился в суд с иском о взыскании задолженности в размере {rng.randint(100000, 5000000)} рублей. В обоснование требований {qv2} сослался на переписку и акт сверки. Суд удовлетворил требования частично."
-            parties = [f"Истец: {qv1}", f"Ответчик: ООО 'Компания {rng.randint(1, 300)}'"]
+            context_text = f"It has been established that {qv1} filed a claim with the court for the amount of the debt {rng.randint(100000, 5000000)} It's a ruble. In support of claims {qv2} referred to correspondence and the act of reconciliation. The Court granted the claims in part."
+            parties = [f"Claimant: {qv1}", f"Defendant: OS & Company {rng.randint(1, 300)}'"]
         elif mention_type == "ответчик":
-            context_text = f"Суд рассмотрел дело по иску к {qv1} о взыскании задолженности по договору. {qv2} не признал требования, указал на отсутствие поставки и заявил о зачёте. В тексте акта {qv3} упоминается неоднократно."
-            parties = [f"Истец: ООО 'Компания {rng.randint(1, 300)}'", f"Ответчик: {qv1}"]
+            context_text = f"The Court heard the case against the {qv1} on the recovery of contractual debts. {qv2} did not accept the claim, indicated the lack of delivery and stated the credit. In the text of the act {qv3} is mentioned repeatedly."
+            parties = [f"Claimant: OS & Company {rng.randint(1, 300)}'", f"Defendant: {qv1}"]
         elif mention_type == "участник":
-            context_text = f"К участию в деле привлечён {qv1} в качестве третьего лица. {qv2} представил пояснения, указал на аффилированность сторон и заявил самостоятельные требования относительно предмета спора."
+            context_text = f"He's involved in the case. {qv1} as a third person. {qv2} presented explanations, pointed out the affiliation of the parties and declared independent claims regarding the subject of the dispute."
             parties = [
-                f"Истец: ООО 'Компания {rng.randint(1, 300)}'",
-                f"Ответчик: ООО 'Компания {rng.randint(301, 600)}'",
-                f"Третье лицо: {qv1}"
+                f"Claimant: OS & Company {rng.randint(1, 300)}'",
+                f"Defendant: OS & Company {rng.randint(301, 600)}'",
+                f"Third person: {qv1}"
             ]
         elif mention_type == "контрагент":
-            context_text = f"В материалах дела представлен договор, заключённый между ответчиком и {qv1}. {qv2} указан в договоре как контрагент. Также в приложениях к договору встречается {qv3}."
+            context_text = f"The case file contains a contract concluded between the defendant and {qv1}. {qv2} is specified in the contract as a counterparty. Also found in the annexes to the treaty {qv3}."
             parties = [
-                f"Истец: ООО 'Компания {rng.randint(1, 300)}'",
-                f"Ответчик: ООО 'Компания {rng.randint(301, 600)}'"
+                f"Claimant: OS & Company {rng.randint(1, 300)}'",
+                f"Defendant: OS & Company {rng.randint(301, 600)}'"
             ]
         else:
-            context_text = f"В тексте судебного акта упоминается {qv1}. Информация о {qv2} содержится в материалах дела, переписке и приложениях. Дополнительно встречается {qv3}, но лицо не привлечено к участию."
+            context_text = f"The text of the judicial act refers to {qv1}. Information on {qv2} in case files, correspondence and annexes. Additional {qv3}but the person was not involved."
             parties = [
-                f"Истец: ООО 'Компания {rng.randint(1, 300)}'",
-                f"Ответчик: ООО 'Компания {rng.randint(301, 600)}'"
+                f"Claimant: OS & Company {rng.randint(1, 300)}'",
+                f"Defendant: OS & Company {rng.randint(301, 600)}'"
             ]
         
-        # Полный текст акта (сокращенный)
-        # Добавляем множественные упоминания и “шум”, чтобы проверить: BM25, embeddings, подсветку, дедуп.
+        # Full text of the act (abbreviated)
+        # Add multiple references to the noises to check: BM25, embeddings, lighting, grandpa.
         mentions_count = rng.randint(1, 12)
         mention_line = " ".join([rng.choice(q_variants) for _ in range(min(mentions_count, 6))])
         act_text = f"""
@@ -155,14 +155,14 @@ def generate_mock_casebook_response(query: str, search_type: str = "fio", count:
 
 {context_text}
 
-В результате рассмотрения дела суд установил следующие обстоятельства. 
-В материалах дела имеются документы, подтверждающие факты, изложенные в исковом заявлении.
-Упоминания (контроль): {mention_line}.
-Для полнотекстового поиска: сторона/участник/контрагент/упоминание.
-Суд считает необходимым удовлетворить требования истца.
+As a result of the proceedings, the Court found the following circumstances. 
+The case file contains documents supporting the facts as set out in the statement of claim.
+Reference (control): {mention_line}.
+For full-text search: party/participant/contractor/memorandum.
+The Court considers it necessary to satisfy the plaintiff &apos; s claims.
 
-РЕШИЛ:
-Взыскать с ответчика в пользу истца {rng.randint(100000, 5000000)} рублей.
+DECIDED:
+Retrieve the defendant in favour of the plaintiff {rng.randint(100000, 5000000)} It's a ruble.
 """.strip()
         
         public_base = os.getenv("PUBLIC_ACT_BASE_URL", "http://localhost:8000/api/acts")
@@ -172,7 +172,7 @@ def generate_mock_casebook_response(query: str, search_type: str = "fio", count:
             "case_number": case_number,
             "court_name": court,
             "date": case_date,
-            # В моковом режиме указываем URL на наш gateway, чтобы работало "скачать акт" и "скачать все файлы".
+            # In the urine mode, we're going to point the URL to our gateway so it works to "slip the act" and "slip all the files."".
             "url": f"{public_base}/{act_id}/download",
             "parties": parties,
             "text": act_text,
@@ -182,8 +182,8 @@ def generate_mock_casebook_response(query: str, search_type: str = "fio", count:
             "context": context_text,
             "type_of_mention": mention_type,
             "region": region,
-            "category": "Гражданские дела",
-            "mentions_count": mentions_count,  # Количество упоминаний в тексте
+            "category": 'Civil affairs',
+            "mentions_count": mentions_count,  # Number of references in text
         }
         
         items.append(item)
@@ -198,140 +198,140 @@ def generate_mock_casebook_response(query: str, search_type: str = "fio", count:
 
 def get_extended_mock_data(query: str, search_type: str = "fio") -> Dict:
     """
-    Расширенные фейковые данные для комплексного тестирования
-    Включает различные сценарии упоминаний
+    Advanced Fake Data for Integrated Testing
+    Including different scripts of references
     """
-    # Масштабируем моковые данные, чтобы “наверняка” показать работу ранжирования/подсветки/LLM-topN.
-    # Детерминированно от (query, search_type) — чтобы тесты были повторяемыми.
+    # Scaling the wet data to show the ranking/lighting/LLM-topN for sure.
+    # Determinated from (query, search_type) — that tests be repeated.
     seed = _stable_seed(query, search_type)
     rng = random.Random(seed)
 
     items: List[Dict] = []
     
-    # Сценарий 1: Истец
+    # Scenario 1: The plaintiff
     items.append({
-        "case_number": "А40-12345/2024",
-        "court_name": "Арбитражный суд города Москвы",
+        "case_number": 'A40-12345/2024',
+        "court_name": 'Court of Arbitration of Moscow',
         "date": "2024-01-15",
         "url": "https://casebook.ru/cases/A40-12345-2024",
-        "parties": [f"Истец: {query}", "Ответчик: ООО 'Пример Компания'"],
-        "text": f"{query} обратился в суд с иском о взыскании задолженности по договору поставки. {query} представил доказательства. Суд удовлетворил требования частично.",
-        "content": f"{query} обратился в суд с иском о взыскании задолженности по договору поставки. {query} представил доказательства. Суд удовлетворил требования частично.",
-        "act_type": "Решение",
-        "type": "Решение",
-        "context": f"В судебном заседании установлено, что {query} обратился в суд с иском.",
+        "parties": [f"Claimant: {query}", 'Defendant: "Example Company"'],
+        "text": f"{query} filed a claim for payment of debt under the contract of delivery. {query} submitted evidence. The Court granted the claims in part.",
+        "content": f"{query} filed a claim for payment of debt under the contract of delivery. {query} submitted evidence. The Court granted the claims in part.",
+        "act_type": 'Decision',
+        "type": 'Decision',
+        "context": f"The court hearing found that {query} I filed a lawsuit with the court.",
         "type_of_mention": "истец",
-        "region": "Москва",
-        "category": "Гражданские дела",
+        "region": 'Moscow',
+        "category": 'Civil affairs',
         "mentions_count": 3,
     })
     
-    # Сценарий 2: Ответчик
+    # Scenario 2: Respondent
     items.append({
-        "case_number": "А41-67890/2024",
-        "court_name": "Арбитражный суд Московской области",
+        "case_number": 'A41-67890/2024',
+        "court_name": 'Court of Arbitration of Moscow Region',
         "date": "2024-02-20",
         "url": "https://casebook.ru/cases/A41-67890-2024",
-        "parties": ["Истец: ООО 'Другая Компания'", f"Ответчик: {query}"],
-        "text": f"Суд рассмотрел дело по иску к {query} о взыскании задолженности. {query} не признал требования.",
-        "content": f"Суд рассмотрел дело по иску к {query} о взыскании задолженности. {query} не признал требования.",
-        "act_type": "Решение",
-        "type": "Решение",
-        "context": f"К {query} предъявлен иск о взыскании задолженности.",
+        "parties": ['Claimant: "Other Company"', f"Defendant: {query}"],
+        "text": f"The Court heard the case against the {query} on the recovery of arrears. {query} I didn't accept the demands.",
+        "content": f"The Court heard the case against the {query} on the recovery of arrears. {query} I didn't accept the demands.",
+        "act_type": 'Decision',
+        "type": 'Decision',
+        "context": f"K {query} A claim for recovery of debts has been filed.",
         "type_of_mention": "ответчик",
-        "region": "Московская область",
-        "category": "Гражданские дела",
+        "region": 'Moscow Region',
+        "category": 'Civil affairs',
         "mentions_count": 5,
     })
     
-    # Сценарий 3: Участник (третье лицо)
+    # Scenario 3: Participant (third person)
     items.append({
-        "case_number": "А50-11111/2023",
-        "court_name": "Арбитражный суд Пермского края",
+        "case_number": 'A50-11111/2023',
+        "court_name": 'Court of Arbitration of the Perm Region',
         "date": "2023-12-10",
         "url": "https://casebook.ru/cases/A50-11111-2023",
         "parties": [
-            "Истец: ИП Иванов И.И.",
-            "Ответчик: ООО 'Третья Компания'",
-            f"Третье лицо: {query}"
+            'Claimant: IP Ivanov I.I.',
+            'Respondent: Third Company',
+            f"Third person: {query}"
         ],
-        "text": f"В деле участвует {query} в качестве третьего лица. {query} заявил самостоятельные требования.",
-        "content": f"В деле участвует {query} в качестве третьего лица. {query} заявил самостоятельные требования.",
-        "act_type": "Определение",
-        "type": "Определение",
-        "context": f"{query} привлечен к участию в деле в качестве третьего лица.",
+        "text": f"Participates in the case {query} as a third person. {query} I made a stand-alone claim.",
+        "content": f"Participates in the case {query} as a third person. {query} I made a stand-alone claim.",
+        "act_type": 'Definition',
+        "type": 'Definition',
+        "context": f"{query} In the case in question, he was tried as a third party.",
         "type_of_mention": "участник",
-        "region": "Пермский край",
-        "category": "Гражданские дела",
+        "region": 'Perm Province',
+        "category": 'Civil affairs',
         "mentions_count": 2,
     })
     
-    # Сценарий 4: Контрагент (упоминание в договоре)
+    # Scenario 4: Contractor (Remark in contract)
     items.append({
-        "case_number": "А43-22222/2024",
-        "court_name": "Арбитражный суд города Санкт-Петербурга и Ленинградской области",
+        "case_number": 'A43-2222/2024',
+        "court_name": 'Court of Arbitration of St. Petersburg and Leningrad Region',
         "date": "2024-03-05",
         "url": "https://casebook.ru/cases/A43-22222-2024",
-        "parties": ["Истец: ООО 'Компания А'", "Ответчик: ООО 'Компания Б'"],
-        "text": f"В материалах дела имеется договор, заключенный между ответчиком и {query}. {query} указан в договоре как контрагент.",
-        "content": f"В материалах дела имеется договор, заключенный между ответчиком и {query}. {query} указан в договоре как контрагент.",
-        "act_type": "Решение",
-        "type": "Решение",
-        "context": f"{query} является контрагентом по договору, заключенному между сторонами спора.",
+        "parties": ['The plaintiff: "A Company A"', 'Defendant: Company B'],
+        "text": f"The case file contains a contract concluded between the defendant and {query}. {query} is specified in the contract as a counterparty.",
+        "content": f"The case file contains a contract concluded between the defendant and {query}. {query} is specified in the contract as a counterparty.",
+        "act_type": 'Decision',
+        "type": 'Decision',
+        "context": f"{query} is a counterparty to a contract concluded between the parties to the dispute.",
         "type_of_mention": "контрагент",
-        "region": "Санкт-Петербург",
-        "category": "Гражданские дела",
+        "region": 'Saint Petersburg',
+        "category": 'Civil affairs',
         "mentions_count": 4,
     })
     
-    # Сценарий 5: Простое упоминание (не участник)
+    # Scenario 5: Simple mention (non-participant)
     items.append({
-        "case_number": "А55-33333/2023",
-        "court_name": "Арбитражный суд Свердловской области",
+        "case_number": 'A55-33333/2023',
+        "court_name": 'Court of Arbitration of Sverdlovsk Region',
         "date": "2023-11-18",
         "url": "https://casebook.ru/cases/A55-33333-2023",
-        "parties": ["Истец: ООО 'Компания В'", "Ответчик: ООО 'Компания Г'"],
-        "text": f"В тексте судебного акта упоминается {query}. {query} фигурирует в переписке между сторонами, но не является участником дела.",
-        "content": f"В тексте судебного акта упоминается {query}. {query} фигурирует в переписке между сторонами, но не является участником дела.",
-        "act_type": "Определение",
-        "type": "Определение",
-        "context": f"{query} упоминается в материалах дела, но не является стороной спора.",
-        "type_of_mention": "упоминание",
-        "region": "Свердловская область",
-        "category": "Гражданские дела",
+        "parties": ['Claimant: Company B', 'Defendant: "G Company"'],
+        "text": f"The text of the judicial act refers to {query}. {query} is in correspondence between the parties but is not a party to the case.",
+        "content": f"The text of the judicial act refers to {query}. {query} is in correspondence between the parties but is not a party to the case.",
+        "act_type": 'Definition',
+        "type": 'Definition',
+        "context": f"{query} referred to in the case file but not party to the dispute.",
+        "type_of_mention": 'Reference',
+        "region": 'Sverdlov region',
+        "category": 'Civil affairs',
         "mentions_count": 2,
     })
 
-    # Генерируем “массу” дополнительных данных
+    # Generate mass of additional data
     base_count = int(os.getenv("MOCK_RESULTS_COUNT", "80"))
     base_count = max(20, min(base_count, 250))
 
     generated = generate_mock_casebook_response(query=query, search_type=search_type, count=base_count, rng=rng)
     items.extend(generated.get("items", []))
 
-    # Добавляем несколько актов по одному делу (чтобы увидеть группировку/дедуп по URL, а не по номеру дела)
+    # Add a few acts to one case (to see a group/dup of URL, not a case number))
     if items:
         for k in range(3):
             src = rng.choice(items)
             clone = dict(src)
-            clone["act_type"] = rng.choice(["Определение", "Постановление", "Решение"])
+            clone["act_type"] = rng.choice(['Definition', 'Regulation', 'Decision'])
             clone["type"] = clone["act_type"]
             clone["date"] = (datetime.now() - timedelta(days=rng.randint(0, 600))).strftime("%Y-%m-%d")
             clone["url"] = f"{src.get('url','')}/followup-{k+1}"
-            clone["context"] = f"Дополнительный акт по делу {clone.get('case_number','')}: {clone.get('context','')}"
+            clone["context"] = f"Additional action in the case {clone.get('case_number','')}: {clone.get('context','')}"
             clone["mentions_count"] = int(src.get("mentions_count", 1)) + rng.randint(0, 3)
             items.append(clone)
 
-    # Контрольный дубликат URL (проверка дедупликации)
+    # Control duplicate URL (Check of deduplication))
     if len(items) >= 5:
         dupe_src = items[1]
         dupe = dict(dupe_src)
         dupe["mentions_count"] = int(dupe.get("mentions_count", 1)) + 1
-        dupe["context"] = f"{dupe.get('context','')} (дубликат для проверки дедупликации)"
-        # тот же url => должен дедупнуться
+        dupe["context"] = f"{dupe.get('context','')} (duplicate to verify deduplication)"
+        # the same url = must be grandpa
         items.append(dupe)
 
-    # Нормализуем лимит/total
+    # Normalize limit/total
     return {
         "items": items,
         "total": len(items),

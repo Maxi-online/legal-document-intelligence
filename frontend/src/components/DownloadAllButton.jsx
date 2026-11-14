@@ -19,8 +19,8 @@ const DownloadAllButton = ({ taskId }) => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Ошибка при скачивании файлов:', error);
-      alert('Ошибка при скачивании файлов. Попробуйте еще раз.');
+      console.error('Error in downloading files:', error);
+      alert('Error in downloading files. Try again.');
     } finally {
       setIsDownloading(false);
     }
@@ -31,17 +31,17 @@ const DownloadAllButton = ({ taskId }) => {
       onClick={handleDownload}
       disabled={isDownloading || !taskId}
       className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
-      title="Скачать все акты с упоминанием (ZIP)"
+      title="download all acts with reference (ZIP)"
     >
       {isDownloading ? (
         <>
           <Loader2 className="animate-spin" size={18} />
-          Скачивание...
+          The download...
         </>
       ) : (
         <>
           <Download size={18} />
-          Скачать все файлы
+          download all files
         </>
       )}
     </button>

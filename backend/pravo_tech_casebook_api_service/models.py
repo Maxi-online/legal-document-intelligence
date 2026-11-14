@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Dict
 
 class CaseData(BaseModel):
-    """Модель данных о деле из Casebook API"""
+    'Casebook API Data Model'
     case_number: str
     court: str
     date: str
@@ -15,7 +15,7 @@ class CaseData(BaseModel):
     metadata: Dict
 
 class CasebookResponse(BaseModel):
-    """Модель ответа от Casebook API"""
+    'Casebook API response model'
     items: List[CaseData]
     total: int
     limit: int

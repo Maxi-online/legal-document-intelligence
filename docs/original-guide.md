@@ -1,63 +1,63 @@
 # DocumentIntelligence
 
-## Инженерный обзор
+## Engineering review
 
-Микросервисная система поиска и обработки юридических документов: gateway, интеграция источника, извлечение и ранжирование, очередь задач, PostgreSQL, Redis и экспорт результатов. Мок внешнего источника позволяет разбирать контракт интеграции отдельно от реального доступа.
+Micro-service search and processing system of legal documents: gateway, source integration, extract and ranking, task line, PostgreSQL, Redis and export results. External moss allows the integration contract to be reviewed separately from real access.
 
-### Навигация по коду
+### Code navigation
 
 - [backend/api_gateway/main.py](backend/api_gateway/main.py)
 - [backend/data_processing_services/orchestrator.py](backend/data_processing_services/orchestrator.py)
 - [backend/pravo_tech_casebook_api_service/mock_data.py](backend/pravo_tech_casebook_api_service/mock_data.py)
 - [docker-compose.yml](docker-compose.yml)
 
-### Воспроизведение и оценка
+### Reproduction and evaluation
 
-Проверяйте поиск, извлечение и корректность ссылок на разрешённом корпусе с разметкой. Моковый ответ внешнего API не подтверждает доступность реального источника и полноту юридического исследования. Производительность, стоимость LLM и качество ответа измеряются отдельно.
+Check the search, extract and correctness of the links on the permitted corner with the tag. External API's wet response does not confirm the availability of a real source and the completeness of the legal study. Productivity, LLM cost and response quality are measured separately.
 
 
-Сервис для **поиска упоминаний физических и юридических лиц в судебных актах** через корпоративный Casebook/PravoTech API (и/или моковый режим), с целью показать:
+Service for **seeking references of natural and legal persons in legal proceedings** through the corporate Casebook/PravoTech API (and/or mouth mode), in order to show:
 
-- **дела, где лицо является стороной**;
-- **акты, где лицо упоминается в тексте**, даже если не является участником дела;
-- **контекст упоминания**, тип/роль и ссылку на акт;
-- экспорт результатов в **Excel/PDF/JSON**.
+- ** Where the person is a party;**
+- **acts in which a person is mentioned in the text** even if he or she is not a party to the case;
+- ** Context of reference**, type/role and reference to act;
+- Export results in **Excel/PDF/JSON**.
 
-Проект реализует требования ТЗ “Поиск упоминаний физических и юридических лиц в судебных актах через API Право.ру”.
+The project fulfils the requirements of TK . . . Search for references to natural and legal persons in court acts through API Right”.
 
-## Ключевые возможности
+## Key opportunities
 
-- **Ввод**: ФИО / ИНН / наименование юрлица; поддерживаются **несколько запросов через запятую**.
-- **Полнотекстовый поиск**: через сервис `pravo_tech_casebook_api_service` (реальный API или мок‑данные).
-- **Постобработка**:
-  - дедупликация по `act_url` (чтобы не терять разные акты одного дела);
-  - ранжирование **BM25 + embeddings** + эвристики;
-  - LLM‑обработка (контекст/роль) **только для top‑N** актов.
-- **Хранение**: PostgreSQL (результаты и аудит‑лог запросов).
-- **Кэш**: Redis (кэш выдачи, статусы задач, эмбеддинги с TTL).
-- **UI**: таблица результатов, фильтры, подсветка найденных строк, экспорт.
+- **Introduction**: FIO / INS / name of turf; supported ** by a few requests by a comma**.
+- **Full text search**: via `pravo_tech_casebook_api_service` service (real API or moss – data)).
+- ** Post-treatment**:
+  - deduplication by `act_url` (to avoid losing different acts of one case));
+  - ranking **BM25 + embeddings** + heuristics;
+  - LLM – Processing (context/role) ** only for top –N** acts.
+- **Storage**: PostgreSQL).
+- **Cash**: Redis (cash issuance, tasks status, embeddings with TTL).
+- **UI**: Results table, filters, line lighting, export.
 
-## Архитектура (микросервисы)
+## Architecture (microservices)
 
 - **`frontend/`** (React + Vite): UI
-- **`backend/api_gateway/`** (FastAPI): единая точка входа, статусы задач, агрегация
-- **`backend/pravo_tech_casebook_api_service/`** (FastAPI): адаптер к Casebook API + моковый режим
-- **`backend/data_processing_services/`** (FastAPI + Celery): ранжирование и top‑N LLM обработка
-- **`backend/database_service/`** (FastAPI + SQLAlchemy): PostgreSQL, результаты и аудит‑лог (`search_logs`)
-- **`backend/cache_service/`** (FastAPI + Redis): кэш значений, статусы задач, embedding cache
-- **`backend/file_export_service/`** (FastAPI): Excel/PDF/JSON экспорт
+- **`Backend/api_gateway/'** (FastAPI): Single Entry Point, Task Status, Aggregation
+- **`Backend/pravo_tech_casebook_api_service/'** (FastAPI): adapter to Casebook API + wet mode
+- **`Backend/data_processing_services/'** (FastAPI + Celery): ranking and top –N LLM processing
+- **`backend/database_service/`** (FastAPI + SQLAlchemy): PostgreSQL, results and audit‑log(`search_logs`)
+- **`Backend/cache_service/'** (FastAPI + Redis): Cash values, task status, embedding cache
+- **`Backend/file_export_service/'** (FastAPI): Excel/PDF/JSON export
 
-## Быстрый старт (Docker Compose)
+## Quick start (Docker Compose)
 
-Требования: Docker + Docker Compose.
+Requirements: Docker + Docker Compase.
 
-Запуск:
+Launch:
 
 ```bash
 docker-compose up -d --build
 ```
 
-Адреса:
+Address:
 
 - **Frontend**: `http://localhost:3000`
 - **API Gateway**: `http://localhost:8000`
@@ -67,65 +67,65 @@ docker-compose up -d --build
 - **File Export Service**: `http://localhost:8004`
 - **Cache Service**: `http://localhost:8005`
 
-## Конфигурация (секреты и параметры)
+## Settings (secrets and parameters)
 
-### Рекомендуемый способ: переменные окружения
+### Recommended method: environmental variables
 
-- **`OPENAI_API_KEY`**: ключ для LLM и embeddings (если не задан — система работает, но без embeddings/LLM‑улучшений)
-- **`CASEBOOK_API_KEY`**: ключ Casebook API (если не задан — включается моковый режим)
-- **`CASEBOOK_BASE_URL`**: базовый URL Casebook API (опционально)
+- **`OPENAI_API_KEY'**: key for LLM and embeddings (if not specified - the system works but no embedding/LLM – improvements)
+- **`CASEBOOK_API_KEY'**: Casebook API key (if not specified, wet mode on))
+- **`CASEBOOK_BASE_URL'**: Core URL Casebook API)
 
-### Альтернативный способ: `settings.json`
+### Alternative: `settings.json`
 
-См. `settings.json.example`. Если `casebook.api_key` пустой или равен значению по умолчанию — используется моковый режим.
+See `settings.json.example`. If `casebook.api_key` is empty or equal to default value, wet mode shall be used.
 
-## Моковый режим (для демо/тестов)
+## Moist mode (demo/test)
 
-Если `CASEBOOK_API_KEY` отсутствует (или `settings.json` без ключа), сервис автоматически использует мок‑данные.
+If `CASEBOOK_API_KEY` is missing (or `settings.json` without key), the service automatically uses moc – data.
 
-Моки включают:
+Moki include:
 
-- фиксированные сценарии (истец/ответчик/третье лицо/контрагент/упоминание);
-- **масштабный набор** (десятки/сотни актов) с разными судами/датами/типами актов, вариантами написания и контрольными дубликатами.
+- fixed scenarios (claimer/defendant/third person/contractor/remark));
+- **scale set** (thousands/hundreds of acts) with different ships/data/types of acts, writing options and control duplicates.
 
-Параметры:
+Parameters:
 
-- **`MOCK_RESULTS_COUNT`**: размер моковой выдачи (20..250), по умолчанию 80.
+- **`MOCK_RESULTS_COUNT'**: wet delivery size (20.250), default 80.
 
-Подробности: `MOCK_API_GUIDE.md` и `backend/pravo_tech_casebook_api_service/README_MOCK.md`.
+Details: `MOCK_API_GUIDE.md` and `backend/pravo_tech_casebook_api_service/README_MOCK.md`.
 
-## API (основное)
+## API (main)
 
 ### API Gateway (`http://localhost:8000`)
 
-- **`POST /api/search`**: создать задачу поиска
-  - `query`: строка, допускает несколько значений через запятую
+- **`POST /api/search`**: Create search task
+  - `query': string, allows several values through a comma
   - `search_type`: `fio | inn | company`
-- **`GET /api/search/status/{task_id}`**: статус задачи (статусы хранятся в Redis с TTL 7 суток)
-- **`GET /api/search/results/{task_id}`**: результаты + счётчики (`total`, `unique_cases_count`, `total_mentions`)
-- **`GET /api/export/{task_id}?format=excel|pdf|json`**: экспорт
+- **`GET /api/search/status/{task_id}'**: Task status (stats stored in Redis with TTL 7 days)
+- **`GET /api/search/results/{task_id}`**: results+ metering(`total`, `unique_cases_count`, `total_mentions`)
+- **`GET /api/export/{task_id}?format=excel
 
 ### Healthchecks
 
-У каждого сервиса есть **`GET /health`**.
+Each service has **`GET /health`**.
 
-## Производительность и тюнинг
+## Productivity and tuning
 
-Ключевые параметры:
+Key parameters:
 
-- **`LLM_TOP_N`** (default 20): сколько актов отправлять в LLM‑обработку
-- **`EMBED_TOP_M`** (default 80): сколько актов по BM25 дообогащать эмбеддингами
-- **`WEIGHT_BM25`** / **`WEIGHT_EMB`**: веса гибридного ранжирования
+- **`LLM_TOP_N'** (default 20): how many acts to send to LLM – processing
+- **`EMBED_TOP_M`** (default 80): how many acts by BM25 are enriched by embeddings
+- **`WEIGHT_BM25`** / **`WEIGHT_EMB`**: Hybrid ranking weight
 
-Цель: укладываться в \( \le 15s \) на запрос при разумном количестве кандидатов.
+Objective: To fit in with a reasonable number of candidates.
 
-## Безопасность и хранение данных
+## Data security and storage
 
-- **Тексты актов** не должны кэшироваться бессрочно: кэш/эмбеддинги настроены на **TTL 7 суток**.
-- Статусы задач — в Redis с TTL (по умолчанию 7 суток).
-- Рекомендуется хранить ключи через env/Secret Manager и не коммитить секреты.
+- **Acts** should not be cashed unlimited: cash/embeddings are set to **TTL 7 days**.
+- The status of the task is in Redis with TTL (7 days default).
+- It is recommended to store keys through env/Secret Manager and not communicate secrets.
 
-## Разработка без Docker (Windows / PowerShell)
+## Development without Docker (Windows / PowerShell)
 
 Backend:
 
@@ -144,20 +144,20 @@ npm install
 npm run dev
 ```
 
-## Roadmap (ближайшее)
+## Roadmap (near)
 
-- “Скачать все акты” (ZIP) при наличии корректного способа получения файлов по ссылкам API
-- Векторный индекс (HNSW/FAISS) для масштабирования embeddings
-- OpenTelemetry/Prometheus‑метрики для SLA и лимитов API
+- “download all acts (ZIP) if there is a correct way to get files from API links
+- Vector Index (HSW/FAISS) for scaling embeddings
+- OpenTelemetry/Prometheus-metrics for SLA and API limits
 
-## Приватная конфигурация
+## Private configuration
 
-Ключи провайдеров, токены, пароли, прокси и персональные параметры задаются через переменные окружения. `.env.example` содержит имена без значений. Заполненный `.env` и локальные настройки исключены из Git. Не передавайте секреты аргументами команд и не публикуйте реальные журналы, выгрузки, сертификаты или пользовательские документы.
+Provider keys, tokens, passwords, proxy and personal parameters are set through variable environments. `.env.example` contains names without values. `.env` filled and local settings deleted from Git. Do not transmit secrets by command arguments and do not publish real magazines, downloads, certificates or user documents.
 
-Для запуска экспортируйте нужные переменные в окружение процесса либо заполните игнорируемый локальный `.env`, если используемый entrypoint его загружает. Содержимое `.env` само по себе не становится окружением произвольной Python-команды. Для Docker Compose значения из `.env` передаются в настроенные сервисы.
+To run, export the required variables to the process environment or fill the ignored local `.env` if the entrypoint used is downloading it. The content of `.env` does not in itself become an environment of arbitrary Python command. For Docker Compose, the values of `.env` are transferred to customized services.
 
-JSON/YAML-настройки используют ссылки `${NAME}`; конфигурационные загрузчики разрешают их через окружение. Для числовых значений предусмотрен `${NAME:int}`. Отсутствующее обязательное значение вызывает ошибку с именем переменной, без её содержимого. Безопасные `*.example.json` / `*.example.yaml` сохраняют структуру настроек.
+JSON/YAML- facilities use `${NAME}` links; configuration loaders allow them through the environment. For numerical values, ${NAME:int}`. Lack of mandatory value causes an error with the name of the variable, without its content. Safe `*.example.json` / `*.example.yaml` save configuration structure.
 
-Имена приватных параметров приведены в [.env.example](.env.example). Старые значения сохранены только в защищённом локальном хранилище владельца; оно не входит в публикуемый проект. После ротации ключей используйте новые значения.
+The names of the private parameters are given in [.env.example](.env.example)). Old values are only retained in the protected local storage facility of the owner; it is not part of the published project. Once the keys are rotated, use new values.
 
-Проверка исходников и формата настроек не заменяет запуск инфраструктуры и оценку модели. Изменения приватности не подтверждают качество AI, работоспособность внешних API или готовность всей системы к эксплуатации.
+Checking the source and configuration formats does not replace the launch of the infrastructure and model evaluation. Privacy changes do not confirm the quality of AI, the performance of external APIs, or the willingness of the entire system to operate.

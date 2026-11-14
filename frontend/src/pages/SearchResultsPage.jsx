@@ -47,7 +47,7 @@ const SearchResultsPage = () => {
           if (!isMounted) return;
           
           setResults(resultsData.results || []);
-          // Обновляем URL с информацией об уникальных делах
+          // Update it. URL with information on unique cases
           if (resultsData.unique_cases_count !== undefined) {
             const newSearchParams = new URLSearchParams(searchParams);
             newSearchParams.set('uniqueCases', resultsData.unique_cases_count);
@@ -56,15 +56,15 @@ const SearchResultsPage = () => {
           setIsLoading(false);
         } else if (statusData.status === 'failed') {
           setIsLoading(false);
-          alert('Ошибка при выполнении поиска');
+          alert('Error in Searching');
         } else {
-          // Опрашиваем снова только если статус pending или processing
+          // Were only interviewing again if the status pending or processing
           if (isMounted) {
             timeoutId = setTimeout(checkStatus, 2000);
           }
         }
       } catch (error) {
-        console.error('Ошибка при проверке статуса:', error);
+        console.error('Error in checking status:', error);
         if (isMounted) {
           setIsLoading(false);
         }
@@ -73,7 +73,7 @@ const SearchResultsPage = () => {
 
     checkStatus();
 
-    // Cleanup функция для отмены таймера при размонтировании компонента
+    // Cleanup cut-off function for component unmounting
     return () => {
       isMounted = false;
       if (timeoutId) {
@@ -100,13 +100,13 @@ const SearchResultsPage = () => {
         <div className="text-center">
           <Loader2 className="animate-spin mx-auto mb-4" size={48} />
           <p className="text-lg text-gray-600">
-            {status === 'pending' ? 'Обработка запроса...' : 'Поиск результатов...'}
+            {status === 'pending' ? 'Request processing...' : 'Searching for results...'}
           </p>
           <button
             onClick={() => navigate('/')}
             className="mt-6 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900"
           >
-            Назад к поиску
+            Back to Search
           </button>
         </div>
       </div>
@@ -116,14 +116,14 @@ const SearchResultsPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Результаты поиска</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Search results</h1>
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/')}
             className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900"
-            title="Вернуться к форме поиска"
+            title="Return to Search Form"
           >
-            Новый поиск
+            New Search
           </button>
           <DownloadAllButton taskId={taskId} />
           <ExportButton taskId={taskId} />
@@ -143,16 +143,16 @@ const SearchResultsPage = () => {
         {results.length > 0 ? (
           <>
             <div className="mb-4 space-y-1 text-sm text-gray-600">
-              <div>Найдено упоминаний: {results.length}</div>
+              <div>Theres been a mention: {results.length}</div>
               {searchParams.get('uniqueCases') && (
-                <div>Уникальных дел: {searchParams.get('uniqueCases')}</div>
+                <div>Unique cases: {searchParams.get('uniqueCases')}</div>
               )}
             </div>
             <ResultTable results={results} filters={filters} highlightTerms={highlightTerms} />
           </>
         ) : (
           <div className="text-center py-12">
-            <p className="text-lg text-gray-600">Результаты не найдены</p>
+            <p className="text-lg text-gray-600">No results found</p>
           </div>
         )}
       </div>
