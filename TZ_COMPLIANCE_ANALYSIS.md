@@ -46,7 +46,7 @@
 - ✅ Qualified references to acts in Excel/PDF
 - ✅ Added download date to export
 
-### 2. Architecture and Walls
+### 2. Architecture and layers
 - ✅ Python 3.11+
 - ✅ FastAPI
 - ✅ httpx for APl requests
