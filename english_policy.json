@@ -1,0 +1,335 @@
+{
+  "purpose": "Engineering prose, comments, docstrings, prompts, UI labels and setup instructions are English. Exact reviewed linguistic data retains its source-language semantics. No directory is excluded.",
+  "data_literals": [
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "6f8e5b6d18fe2f32a9420205c191f493935b2c969f5e769c80131de40d0ee27f",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "fbdc6d21608b5294a9967e8a763430cdf20978999a97c4fd5eb8645de157540a",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "4676056ad73b9fa85c74b56da8de0c98cd8a10f41f4eca9a98bb838f156ea2fc",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "66648fe1c45a3aa1f3ba67143a32b5b37961a663671a0177d2a8112274fcae0d",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "f0815a49dacf0f94002cd01cca513394231d9476442993e1e2ab44f538f65450",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "3728896b3609663f6f8a62e7b53f7699519a59ed4ee6ce5f5cbc53f705daba23",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "d4278f900b99d21bacbb193dc51d1abd707614bcc140d8569efa01ed0e64d3a4",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "1ef22baea0ae8e6bf548858642ce345e509c0085b4d34ce64e4d0485fffc6dc9",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "5f705c9d5aff5b8d22c8f4b409dc55beea137a03848270108473603231f2404d",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "46d9c05f72e184e709c014ee8d51f89c20c85109da30feed35e50da63eb998bc",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/api_gateway/main.py",
+      "sha256": "ef8e647165e68deb30d3cdd99f0535e888010bbeb81ddbbdfef90007dadf1722",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "ef8e647165e68deb30d3cdd99f0535e888010bbeb81ddbbdfef90007dadf1722",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "46d9c05f72e184e709c014ee8d51f89c20c85109da30feed35e50da63eb998bc",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "d4278f900b99d21bacbb193dc51d1abd707614bcc140d8569efa01ed0e64d3a4",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "3728896b3609663f6f8a62e7b53f7699519a59ed4ee6ce5f5cbc53f705daba23",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "6f8e5b6d18fe2f32a9420205c191f493935b2c969f5e769c80131de40d0ee27f",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "4676056ad73b9fa85c74b56da8de0c98cd8a10f41f4eca9a98bb838f156ea2fc",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "f0815a49dacf0f94002cd01cca513394231d9476442993e1e2ab44f538f65450",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "fbdc6d21608b5294a9967e8a763430cdf20978999a97c4fd5eb8645de157540a",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "66648fe1c45a3aa1f3ba67143a32b5b37961a663671a0177d2a8112274fcae0d",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "1ef22baea0ae8e6bf548858642ce345e509c0085b4d34ce64e4d0485fffc6dc9",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "74886b87369bb3e2af2f3ace30331f7e16a98d8efe14e4aa939e34886224a103",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "f75f196e72667575ab43050356477ffba8686ca13c8899bd0d75e45d8f7899dc",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "5f705c9d5aff5b8d22c8f4b409dc55beea137a03848270108473603231f2404d",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "8e687c9a2ac532a311a1a75c92ca777d4facf7ce388c41ff11cca9d73804a203",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/classification.py",
+      "sha256": "4a907dd6e968fbb8f4b4c818072c47624af8dad14814e3a4b39df3b827e24ded",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "6f8e5b6d18fe2f32a9420205c191f493935b2c969f5e769c80131de40d0ee27f",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "4676056ad73b9fa85c74b56da8de0c98cd8a10f41f4eca9a98bb838f156ea2fc",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "3728896b3609663f6f8a62e7b53f7699519a59ed4ee6ce5f5cbc53f705daba23",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "1ef22baea0ae8e6bf548858642ce345e509c0085b4d34ce64e4d0485fffc6dc9",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "5a32638e43c6a20636a396affa718025a596da0849bba4f3e2a8f27390d3091c",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "46d9c05f72e184e709c014ee8d51f89c20c85109da30feed35e50da63eb998bc",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "fbdc6d21608b5294a9967e8a763430cdf20978999a97c4fd5eb8645de157540a",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "66648fe1c45a3aa1f3ba67143a32b5b37961a663671a0177d2a8112274fcae0d",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "f0815a49dacf0f94002cd01cca513394231d9476442993e1e2ab44f538f65450",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/data_processing_services/orchestrator.py",
+      "sha256": "d4278f900b99d21bacbb193dc51d1abd707614bcc140d8569efa01ed0e64d3a4",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/pravo_tech_casebook_api_service/mock_data.py",
+      "sha256": "a1b22622b468bf234045401f81eb0c862b98a8757fadc3b378ea373eafed6b4d",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/pravo_tech_casebook_api_service/mock_data.py",
+      "sha256": "e3b224d51ed2564e1414083cdf00dc1a9dec978f8349a691ed5a00dd603181e9",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/pravo_tech_casebook_api_service/mock_data.py",
+      "sha256": "6f8e5b6d18fe2f32a9420205c191f493935b2c969f5e769c80131de40d0ee27f",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/pravo_tech_casebook_api_service/mock_data.py",
+      "sha256": "4676056ad73b9fa85c74b56da8de0c98cd8a10f41f4eca9a98bb838f156ea2fc",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/pravo_tech_casebook_api_service/mock_data.py",
+      "sha256": "3728896b3609663f6f8a62e7b53f7699519a59ed4ee6ce5f5cbc53f705daba23",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/pravo_tech_casebook_api_service/mock_data.py",
+      "sha256": "1ef22baea0ae8e6bf548858642ce345e509c0085b4d34ce64e4d0485fffc6dc9",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/pravo_tech_casebook_api_service/mock_data.py",
+      "sha256": "f0815a49dacf0f94002cd01cca513394231d9476442993e1e2ab44f538f65450",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "3728896b3609663f6f8a62e7b53f7699519a59ed4ee6ce5f5cbc53f705daba23",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "d4278f900b99d21bacbb193dc51d1abd707614bcc140d8569efa01ed0e64d3a4",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "1ef22baea0ae8e6bf548858642ce345e509c0085b4d34ce64e4d0485fffc6dc9",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "5f705c9d5aff5b8d22c8f4b409dc55beea137a03848270108473603231f2404d",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "6f8e5b6d18fe2f32a9420205c191f493935b2c969f5e769c80131de40d0ee27f",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "4676056ad73b9fa85c74b56da8de0c98cd8a10f41f4eca9a98bb838f156ea2fc",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "f0815a49dacf0f94002cd01cca513394231d9476442993e1e2ab44f538f65450",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "fbdc6d21608b5294a9967e8a763430cdf20978999a97c4fd5eb8645de157540a",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "66648fe1c45a3aa1f3ba67143a32b5b37961a663671a0177d2a8112274fcae0d",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "46d9c05f72e184e709c014ee8d51f89c20c85109da30feed35e50da63eb998bc",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "backend/utils/translations.json",
+      "sha256": "ef8e647165e68deb30d3cdd99f0535e888010bbeb81ddbbdfef90007dadf1722",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "3728896b3609663f6f8a62e7b53f7699519a59ed4ee6ce5f5cbc53f705daba23",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "d4278f900b99d21bacbb193dc51d1abd707614bcc140d8569efa01ed0e64d3a4",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "1ef22baea0ae8e6bf548858642ce345e509c0085b4d34ce64e4d0485fffc6dc9",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "5f705c9d5aff5b8d22c8f4b409dc55beea137a03848270108473603231f2404d",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "6f8e5b6d18fe2f32a9420205c191f493935b2c969f5e769c80131de40d0ee27f",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "4676056ad73b9fa85c74b56da8de0c98cd8a10f41f4eca9a98bb838f156ea2fc",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "f0815a49dacf0f94002cd01cca513394231d9476442993e1e2ab44f538f65450",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "fbdc6d21608b5294a9967e8a763430cdf20978999a97c4fd5eb8645de157540a",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "66648fe1c45a3aa1f3ba67143a32b5b37961a663671a0177d2a8112274fcae0d",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "46d9c05f72e184e709c014ee8d51f89c20c85109da30feed35e50da63eb998bc",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "frontend/public/translations.json",
+      "sha256": "ef8e647165e68deb30d3cdd99f0535e888010bbeb81ddbbdfef90007dadf1722",
+      "reason": "External JSON schema key."
+    },
+    {
+      "path": "tests/offline/test_core.py",
+      "sha256": "3cb79e34b897d7d8cf14af53cc29bcdb52118a2c0dcb2eac2b202451234f14e2",
+      "reason": "Source-language vocabulary, external data schema, or a linguistic parser fixture; retain the exact runtime value."
+    }
+  ]
+}

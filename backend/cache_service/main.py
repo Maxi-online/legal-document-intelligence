@@ -10,14 +10,14 @@ load_dotenv()
 
 app = FastAPI(title="Cache Service", version="1.0.0")
 
-# Подключение к Redis
+# Connecting to Redis
 REDIS_URL = os.getenv("REDIS_URL", "")
 redis_client = redis.from_url(REDIS_URL, decode_responses=False)
 
 class CacheSetRequest(BaseModel):
     key: str
     value: Any
-    ttl: int = 3600  # Время жизни в секундах (по умолчанию 1 час)
+    ttl: int = 3600  # Life time in seconds (consort 1 hour)
 
 class CacheGetResponse(BaseModel):
     cached: bool
@@ -25,12 +25,12 @@ class CacheGetResponse(BaseModel):
 
 @app.post("/cache/set")
 async def set_cache(request: CacheSetRequest):
-    """Установка значения в кэш"""
+    'Cache setting'
     try:
-        # Сериализуем значение в JSON
+        # Serialize the value in JSON
         value_json = json.dumps(request.value, ensure_ascii=False)
         
-        # Сохраняем в Redis
+        # Save at Redis
         redis_client.setex(
             request.key,
             request.ttl,
@@ -47,7 +47,7 @@ async def set_cache(request: CacheSetRequest):
 
 @app.get("/cache/get")
 async def get_cache(key: str):
-    """Получение значения из кэша"""
+    'Capture value from cache'
     try:
         value_bytes = redis_client.get(key)
         
@@ -57,7 +57,7 @@ async def get_cache(key: str):
                 "value": None
             }
         
-        # Десериализуем из JSON
+        # Desery from JSON
         value_json = value_bytes.decode('utf-8')
         value = json.loads(value_json)
         
@@ -66,7 +66,7 @@ async def get_cache(key: str):
             "value": value
         }
     except json.JSONDecodeError:
-        # Если не удалось распарсить, возвращаем как есть
+        # If we can't unpack, we'll return as we are.
         return {
             "cached": True,
             "value": value_bytes.decode('utf-8') if value_bytes else None
@@ -76,7 +76,7 @@ async def get_cache(key: str):
 
 @app.delete("/cache/delete/{key}")
 async def delete_cache(key: str):
-    """Удаление значения из кэша"""
+    'Remove value from cache'
     try:
         deleted = redis_client.delete(key)
         return {
@@ -88,7 +88,7 @@ async def delete_cache(key: str):
 
 @app.get("/cache/clear")
 async def clear_cache():
-    """Очистка всего кэша"""
+    'Cleaning All Cash'
     try:
         redis_client.flushdb()
         return {
@@ -100,7 +100,7 @@ async def clear_cache():
 
 @app.get("/health")
 async def health():
-    """Проверка здоровья сервиса"""
+    'Service health check'
     try:
         redis_client.ping()
         return {"status": "healthy", "service": "cache_service"}

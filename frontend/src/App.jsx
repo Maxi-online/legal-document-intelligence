@@ -31,11 +31,11 @@ const HomePage = () => {
         if (searchParams?.search_type) qp.set('searchType', searchParams.search_type);
         navigate(`/results?${qp.toString()}`);
       } else {
-        alert('Ошибка: не получен task_id');
+        alert('Error: Not received task_id');
       }
     } catch (error) {
-      console.error('Ошибка при поиске:', error);
-      alert(error.error || 'Ошибка при выполнении поиска');
+      console.error('Error in search:', error);
+      alert(error.error || 'Error in Searching');
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +47,7 @@ const HomePage = () => {
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-900 mb-4">DocumentIntelligence</h1>
           <p className="text-xl text-gray-600">
-            Система поиска и анализа судебных актов
+            System for the Search and Analysis of Judicial Acts
           </p>
           <div className="mt-6 flex justify-center gap-3">
             <ClearCacheButton />
@@ -60,27 +60,27 @@ const HomePage = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">Как это работает?</h2>
+          <h2 className="text-2xl font-semibold mb-4">How does it work?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="text-4xl mb-2">1️⃣</div>
-              <h3 className="font-semibold mb-2">Введите запрос</h3>
+              <h3 className="font-semibold mb-2">Enter Request</h3>
               <p className="text-gray-600 text-sm">
-                Укажите ФИО, ИНН или наименование организации
+                Please specify the IFI, INN or name of the organization.
               </p>
             </div>
             <div className="text-center">
               <div className="text-4xl mb-2">2️⃣</div>
-              <h3 className="font-semibold mb-2">ИИ обработка</h3>
+              <h3 className="font-semibold mb-2">I.I. Processing</h3>
               <p className="text-gray-600 text-sm">
-                Система найдет и проанализирует судебные акты с помощью ИИ
+                The system will find and analyse the judicial acts with the help of I.I
               </p>
             </div>
             <div className="text-center">
               <div className="text-4xl mb-2">3️⃣</div>
-              <h3 className="font-semibold mb-2">Получите результаты</h3>
+              <h3 className="font-semibold mb-2">Get results.</h3>
               <p className="text-gray-600 text-sm">
-                Просматривайте, фильтруйте и экспортируйте результаты
+                Check, filter and export the results
               </p>
             </div>
           </div>

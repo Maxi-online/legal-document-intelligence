@@ -35,9 +35,9 @@ const SearchForm = ({ onSearch, isLoading }) => {
             onChange={handleChange}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="fio">ФИО</option>
-            <option value="inn">ИНН</option>
-            <option value="company">Наименование юридического лица</option>
+            <option value="fio">FIO</option>
+            <option value="inn">INN</option>
+            <option value="company">Name of legal entity</option>
           </select>
           <input
             type="text"
@@ -46,10 +46,10 @@ const SearchForm = ({ onSearch, isLoading }) => {
             onChange={handleChange}
             placeholder={
               formData.searchType === 'fio'
-                ? 'Введите ФИО'
+                ? 'Enter FIO'
                 : formData.searchType === 'inn'
-                ? 'Введите ИНН'
-                : 'Введите наименование организации'
+                ? 'Enter the INN'
+                : 'Enter organization name'
             }
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isLoading}
@@ -62,12 +62,12 @@ const SearchForm = ({ onSearch, isLoading }) => {
             {isLoading ? (
               <>
                 <Loader2 className="animate-spin" size={20} />
-                Поиск...
+                Search...
               </>
             ) : (
               <>
                 <Search size={20} />
-                Найти
+                Find
               </>
             )}
           </button>

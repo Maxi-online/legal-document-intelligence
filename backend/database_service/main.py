@@ -46,7 +46,7 @@ load_dotenv()
 
 app = FastAPI(title="Database Service", version="1.0.0")
 
-# Подключение к базе данных
+# Connecting to the database
 def _decrypt_settings_payload(payload: Dict, passphrase: str) -> Dict:
     from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
     from cryptography.hazmat.primitives import hashes
@@ -119,22 +119,22 @@ def _database_url_from_settings() -> Optional[str]:
         url = f"{url}?sslmode={sslmode}"
     return url
 
-# ВАЖНО: основной источник конфигурации БД — settings.json / settings.json.enc.
-# Env DATABASE_URL оставляем только как fallback (для ручного override в исключительных случаях).
-# В docker-сети Postgres доступен по hostname `postgres`. `localhost` внутри контейнера — это сам контейнер.
+# MANAGEMENT: The main source of the database configuration is settings.json / settings.json.enc.
+# Env DATABASE_URL is left only as fallback (for hand override in exceptional cases)).
+# The postgres docker network is available on the homename `postgres`. `localhost` inside the container is the container itself.
 _db_url_from_settings = _database_url_from_settings()
 _db_url_from_env = os.getenv("DATABASE_URL")
 _db_url_fallback = os.environ["DB_URL_FALLBACK"]
 
 DATABASE_URL = _db_url_from_settings or _db_url_from_env or _db_url_fallback
 
-# Отладочный вывод для диагностики
+# Debugging output for diagnostics
 print(f"[database_service] DB URL from settings: {_db_url_from_settings}")
 print(f"[database_service] DB URL from env: {_db_url_from_env}")
 print(f"[database_service] DB URL fallback: {_db_url_fallback}")
-print(f"[database_service] Final DATABASE_URL: {DATABASE_URL[:50]}...")  # Первые 50 символов для безопасности
+print(f"[database_service] Final DATABASE_URL: {DATABASE_URL[:50]}...")  # First 50 symbols for safety
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)  # pool_pre_ping для автоматической проверки соединения
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)  # pool_pre_ping for automatic connection check
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # ---- admin auth for dangerous operations (clear DB) ----
@@ -163,7 +163,7 @@ def require_admin(token: str = Depends(oauth2_scheme)) -> Dict:
 class Base(DeclarativeBase):
     pass
 
-# Модели базы данных
+# Database models
 class Case(Base):
     __tablename__ = "cases"
     
@@ -181,7 +181,7 @@ class Case(Base):
     classification = Column(String, index=True)
     relevance_score = Column(Float, index=True)
     extraction_confidence = Column(Float)
-    case_metadata = Column(JSON)  # Переименовано из metadata, так как metadata зарезервировано в SQLAlchemy
+    case_metadata = Column(JSON)  # Renamed metadata because metadata is reserved in SQLAlchemy
     created_at = Column(DateTime, default=datetime.now)
 
 class SearchLog(Base):
@@ -200,10 +200,10 @@ class SearchLog(Base):
     created_at = Column(DateTime, default=datetime.now)
     completed_at = Column(DateTime, nullable=True)
 
-# Создание таблиц
+# Establishment of tables
 Base.metadata.create_all(bind=engine)
 
-# Зависимость для получения сессии БД
+# Dependency to receive an database session
 def get_db():
     db = SessionLocal()
     try:
@@ -212,7 +212,7 @@ def get_db():
         db.close()
 
 def _parse_date(date_str):
-    """Парсинг даты из различных форматов"""
+    'Parsing dates from different formats'
     if not date_str:
         return None
     try:
@@ -268,7 +268,7 @@ class ResultResponse(BaseModel):
 
 @app.post("/api/results/save")
 async def save_results(request: SaveResultsRequest):
-    """Сохранение результатов поиска в базу данных"""
+    'Maintaining search results in the database'
     db = SessionLocal()
     try:
         saved_cases = []
@@ -312,7 +312,7 @@ async def save_results(request: SaveResultsRequest):
 
 @app.post("/api/search_logs/create")
 async def create_search_log(request: CreateSearchLogRequest):
-    """Создать запись аудита поиска (ТЗ п.6: логирование)"""
+    'Create a search audit record (MLP p.6: logic)'
     db = SessionLocal()
     try:
         log = SearchLog(
@@ -334,12 +334,12 @@ async def create_search_log(request: CreateSearchLogRequest):
 
 @app.post("/api/search_logs/update")
 async def update_search_log(request: UpdateSearchLogRequest):
-    """Обновить запись аудита поиска"""
+    'Update search audit record'
     db = SessionLocal()
     try:
         log = db.query(SearchLog).filter(SearchLog.task_id == request.task_id).order_by(SearchLog.id.desc()).first()
         if not log:
-            # если лог не создан (например, перезапуск сервиса), создаём на лету
+            # If the log is not created (e.g. restarting the service), create on-flight
             log = SearchLog(task_id=request.task_id, query="", search_type="", created_at=datetime.now())
             db.add(log)
             db.flush()
@@ -363,7 +363,7 @@ async def update_search_log(request: UpdateSearchLogRequest):
 
 @app.get("/api/results/{task_id}")
 async def get_results(task_id: str):
-    """Получение результатов по task_id"""
+    'Results for task_id'
     db = SessionLocal()
     try:
         from sqlalchemy import select
@@ -390,7 +390,7 @@ async def get_results(task_id: str):
                 "metadata": case.case_metadata or {},
             })
         
-        # Подсчет уникальных дел и упоминаний (ТЗ п.3.4)
+        # Counting of unique cases and references (T3.4)
         unique_cases = set()
         total_mentions = len(cases)
         
@@ -398,10 +398,10 @@ async def get_results(task_id: str):
             if case.case_number:
                 unique_cases.add(case.case_number)
         
-        # Сортировка по дате (новые выше) и релевантности (ТЗ п.3.3)
+        # Sorting by date (new above) and relevance (T3.3))
         results.sort(key=lambda x: (
-            x.get("date") or "",  # По дате (новые выше - desc)
-            -(x.get("relevance_score") or 0.0)  # По релевантности (выше - desc)
+            x.get("date") or "",  # By date (new above - desc)
+            -(x.get("relevance_score") or 0.0)  # Relevant (above - desc)
         ), reverse=True)
         
         return {
@@ -422,8 +422,8 @@ async def get_results(task_id: str):
 @app.post("/api/admin/clear")
 async def clear_database(request: ClearDatabaseRequest, _: Dict = Depends(require_admin)):
     """
-    Опасная операция: очистка данных в PostgreSQL.
-    Доступна только admin (JWT roles включает "admin").
+    Dangerous operation: PostgreSQL clean-up.
+    Only admin is available (JWT rolls include "admin").
     """
     if request.scope not in ("all", "task"):
         raise HTTPException(status_code=400, detail="Invalid scope. Use: all|task")
@@ -459,7 +459,7 @@ async def search_results(
     min_relevance: Optional[float] = None,
     limit: int = 100
 ):
-    """Поиск результатов с фильтрами"""
+    'Searching for filter results'
     db = SessionLocal()
     try:
         from sqlalchemy import select
@@ -503,7 +503,7 @@ async def search_results(
 
 @app.get("/health")
 async def health():
-    """Проверка здоровья сервиса"""
+    'Service health check'
     try:
         db = SessionLocal()
         db.execute(text("SELECT 1"))

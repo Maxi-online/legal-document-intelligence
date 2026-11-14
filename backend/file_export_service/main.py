@@ -17,7 +17,7 @@ class ExportRequest(BaseModel):
 
 @app.post("/api/export")
 async def export_data(request: ExportRequest):
-    """Экспорт данных в указанном формате"""
+    'Export of data in this format'
     try:
         if request.format == "excel":
             file_content = export_to_excel(request.data, request.task_id)
@@ -48,7 +48,7 @@ async def export_data(request: ExportRequest):
 
 @app.get("/health")
 async def health():
-    """Проверка здоровья сервиса"""
+    'Service health check'
     return {"status": "healthy", "service": "file_export_service"}
 
 if __name__ == "__main__":
