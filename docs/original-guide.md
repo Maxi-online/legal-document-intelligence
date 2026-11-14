@@ -6,10 +6,10 @@ Micro-service search and processing system of legal documents: gateway, source i
 
 ### Code navigation
 
-- [backend/api_gateway/main.py](backend/api_gateway/main.py)
-- [backend/data_processing_services/orchestrator.py](backend/data_processing_services/orchestrator.py)
-- [backend/pravo_tech_casebook_api_service/mock_data.py](backend/pravo_tech_casebook_api_service/mock_data.py)
-- [docker-compose.yml](docker-compose.yml)
+- [backend/api_gateway/main.py](../backend/api_gateway/main.py)
+- [backend/data_processing_services/orchestrator.py](../backend/data_processing_services/orchestrator.py)
+- [backend/pravo_tech_casebook_api_service/mock_data.py](../backend/pravo_tech_casebook_api_service/mock_data.py)
+- [docker-compose.yml](../docker-compose.yml)
 
 ### Reproduction and evaluation
 
@@ -158,6 +158,6 @@ To run, export the required variables to the process environment or fill the ign
 
 JSON/YAML- facilities use `${NAME}` links; configuration loaders allow them through the environment. For numerical values, ${NAME:int}`. Lack of mandatory value causes an error with the name of the variable, without its content. Safe `*.example.json` / `*.example.yaml` save configuration structure.
 
-The names of the private parameters are given in [.env.example](.env.example). Old values are only retained in the protected local storage facility of the owner; it is not part of the published project. Once the keys are rotated, use new values.
+The names of the private parameters are given in [.env.example](../.env.example). Old values are only retained in the protected local storage facility of the owner; it is not part of the published project. Once the keys are rotated, use new values.
 
 Checking the source and configuration formats does not replace the launch of the infrastructure and model evaluation. Privacy changes do not confirm the quality of AI, the performance of external APIs, or the willingness of the entire system to operate.
