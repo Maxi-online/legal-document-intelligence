@@ -36,10 +36,10 @@ Or leave it empty:
 ### 2. Start the system
 
 ```bash
-# Launching through Docer Compase
+# Start with Docker Compose
 docker-compose up -d
 
-# Or launch without Docker (as usual)
+# Or launch without Docker (As usual)
 # The system will automatically determine the absence of the key and use moss data
 ```
 
@@ -62,13 +62,13 @@ docker-compose up -d
 
 The data includes 5 fixed scenarios + a large set so that the demonstration is visible even with a large number of acts.
 
-| Scenario ♪ Case number ♪ Type of reference ♪ Description |
+| Scenario | Case number | Type of reference | Description |
 |----------|------------|----------------|----------|
-| Claimant A40-12345/2024 ♪ claimant ♪ claimer ♪ |
-| Respondent A41-67890/2024 ♪ Respondent ♪ The person against whom the claim is brought |
-| A50-11111/2023 ♪ Third party Original Air Date on October 14, 2013 |
-| Counterparty A43-2222/2024 ♪ counterparty ♪ Party to the contract |
-| Reference to A55-33333/2023 ♪ reference ♪ simple reference in text |
+| The plaintiff | A40-12345/2024 | Claimant | The person who filed the claim |
+| Defendant | A41-67890/2024 | respondent | The person against whom the action is brought |
+| Member | A50-11111/2023 | State party | Third person in the case |
+| Contractor | A43-22222/2024 | counterparty | Party to the treaty |
+| Reference | A55-33333/2023 | Reference | Simple reference in the text |
 
 ### Scale
 
@@ -122,20 +122,20 @@ docker-compose up -d
 # http://localhost:3000
 
 # 3. Do a search
-# Request: "Ivans Demo Individual"
+# Request: "Ivanov Demo Individual"
 # Type: FIO
 
 # 4. System automatically:
-# - Using wet data (5 results)
-# - Processing through GPT agents.
-# - Saves it at PostgreSQL.
-# - Cashing in Redis.
-# - Shows the results on the front line.
+# - Uses moss data (5 Results)
+# - Processing through GPT Agents
+# - Saves in PostgreSQL
+# - Cashing in Redis
+# - Shows the results on the frontend
 
 # 5. Check the results:
-# - A table of the files found.
+# - Table of cases found
 # - Court filters, type of reference
-# - Export to Excel/PDF/JSON
+# - Exports to Excel/PDF/JSON
 ```
 
 ## Switch to Real API
@@ -184,7 +184,7 @@ If it is necessary to check if the moose data are used:
 # Look at the service logs.
 docker-compose logs pravo_api_service
 
-# You'll see either:
-# - Messages on the use of moc data (if key not specified))
-# - Real API requests (if specified)
+# Youll see either:
+# - Reports on the use of wet data (if the key is not specified)
+# - Requests for real API (if the key is specified)
 ```
