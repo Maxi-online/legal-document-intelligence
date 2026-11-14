@@ -14,4 +14,4 @@ openpyxl==3.1.5
 reportlab==4.2.5
 python-dotenv==1.0.1
 aiofiles==24.1.0
-python-multipart==0.0.12
+python-multipart==0.0.31
