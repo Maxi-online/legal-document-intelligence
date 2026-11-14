@@ -50,7 +50,7 @@ def _resolve_settings_env(value):
 
 load_dotenv()
 
-# Настройка логирования
+# Logging settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -64,16 +64,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# URLs микросервисов
+# URLs microservices
 CASEBOOK_API_SERVICE_URL = os.getenv("CASEBOOK_API_SERVICE_URL", "http://localhost:8001")
 DATA_PROCESSING_SERVICE_URL = os.getenv("DATA_PROCESSING_SERVICE_URL", "http://localhost:8002")
 DATABASE_SERVICE_URL = os.getenv("DATABASE_SERVICE_URL", "http://localhost:8003")
 FILE_EXPORT_SERVICE_URL = os.getenv("FILE_EXPORT_SERVICE_URL", "http://localhost:8004")
 CACHE_SERVICE_URL = os.getenv("CACHE_SERVICE_URL", "http://localhost:8005")
 
-# Таймауты для вызова data_processing.
-# Важно: если передать в httpx timeout как число, оно применяется и к connect timeout.
-# Это приводит к "вечному ожиданию" при проблемах DNS/сети между контейнерами.
+# Timeout to call data_processing.
+# It's important that if you transfer it to httpx timeout as a number, it also applies to contact timeout.
+# This leads to "Eternal Waiting" for DNS/Network problems between containers.
 DATA_PROCESSING_READ_TIMEOUT_SECONDS = float(os.getenv("DATA_PROCESSING_HTTP_TIMEOUT_SECONDS", "1200"))
 DATA_PROCESSING_CONNECT_TIMEOUT_SECONDS = float(os.getenv("DATA_PROCESSING_CONNECT_TIMEOUT_SECONDS", "10"))
 DATA_PROCESSING_TIMEOUT = httpx.Timeout(
@@ -84,8 +84,8 @@ DATA_PROCESSING_TIMEOUT = httpx.Timeout(
 )
 
 # ---------- Auth (JWT) ----------
-# ВАЖНО: api_gateway в контейнере не имеет доступа к `backend/utils.py`,
-# поэтому загрузку settings делаем локально (settings.json / settings.json.enc).
+# IMPORTANT: api_gateway in container does not have access to `backend/utils.py`,
+# So we're loading settings locally (settings.json / settings.json.enc)).
 def _decrypt_settings_payload(payload: Dict[str, Any], passphrase: str) -> Dict[str, Any]:
     from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
     from cryptography.hazmat.primitives import hashes
@@ -117,10 +117,10 @@ def _decrypt_settings_payload(payload: Dict[str, Any], passphrase: str) -> Dict[
 
 def load_settings() -> Dict[str, Any]:
     """
-    Загружает settings из одного из путей:
-    - /settings.json.enc (в docker-compose монтируется сюда)
+    Loads settings from one of the tracks:
+    - /settings.json.enc (docker-composite mounted here)
     - /settings.json
-    - ./settings.json.enc / ./settings.json (локальный запуск)
+    - ./settings.json.enc / / settings.json (local launch))
     """
     possible_enc = [
         Path("/settings.json.enc"),
@@ -190,22 +190,22 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any]:
     cfg = _auth_settings()
     try:
         if not token:
-            print("[get_current_user] Токен отсутствует")
+            print('[get_current_user] No token')
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token missing")
-        print(f"[get_current_user] Получен токен: {token[:20]}...")
+        print(f"[get_current_user] Token received: {token[:20]}...")
         payload = jwt.decode(token, cfg["secret"], algorithms=["HS256"])
         username = payload.get("sub")
         roles = payload.get("roles") or []
         if not username:
-            print(f"[get_current_user] Токен не содержит username: {payload}")
+            print(f"[get_current_user] Token does not contain username: {payload}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        print(f"[get_current_user] Успешная авторизация: username={username}, roles={roles}")
+        print(f"[get_current_user] Successful authorisation: username={username}, roles={roles}")
         return {"username": username, "roles": roles}
     except JWTError as e:
         print(f"[get_current_user] JWTError: {e}")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     except Exception as e:
-        print(f"[get_current_user] Исключение: {e}")
+        print(f"[get_current_user] Exemption: {e}")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 def require_admin(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
@@ -214,15 +214,15 @@ def require_admin(current_user: Dict[str, Any] = Depends(get_current_user)) -> D
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin role required")
     return current_user
 
-TASK_STATUS_TTL_SECONDS = int(os.getenv("TASK_STATUS_TTL_SECONDS", "604800"))  # 7 суток по ТЗ (retention)
+TASK_STATUS_TTL_SECONDS = int(os.getenv("TASK_STATUS_TTL_SECONDS", "604800"))  # 7 days for TK (retension)
 
-# In-memory fallback (используем только если cache_service недоступен)
+# In-memory fallsback (use only if cache_service is not available))
 task_status = {}
 
 async def _set_task_status(task_id: str, status_payload: dict):
     """
-    Сохраняем статус задачи в cache_service (Redis), чтобы переживать рестарты gateway.
-    Best-effort: при ошибке падаем обратно на in-memory.
+    Keep the task status in cache_service (Redis) to survive the restarts of the Gateway.
+    Best-effort: If a mistake, we fall back to in-memory.
     """
     task_status[task_id] = status_payload
     try:
@@ -241,7 +241,7 @@ async def _set_task_status(task_id: str, status_payload: dict):
 from typing import Optional, Dict, Any
 
 async def _get_task_status(task_id: str) -> Optional[Dict[str, Any]]:
-    """Читаем статус задачи из cache_service (Redis)."""
+    'Read the task status from cache_service (Redis).'
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             resp = await client.get(
@@ -289,8 +289,8 @@ async def me(current_user: Dict[str, Any] = Depends(get_current_user)):
 @app.get("/api/acts/{act_id}/download")
 async def download_act(act_id: str, current_user: Dict[str, Any] = Depends(get_current_user)):
     """
-    Proxy скачивания одного акта через Casebook API Service.
-    В моковом режиме pravo_api_service отдаёт текстовый файл.
+    Proxie downloading one act through the Casebook API Service.
+    In wet mode pravo_api_service gives text file.
     """
     async with httpx.AsyncClient(timeout=60.0) as client:
         resp = await client.get(f"{CASEBOOK_API_SERVICE_URL}/api/acts/{act_id}/download")
@@ -305,8 +305,8 @@ async def download_act(act_id: str, current_user: Dict[str, Any] = Depends(get_c
 @app.get("/api/acts/download_all/{task_id}")
 async def download_all_acts(task_id: str, current_user: Dict[str, Any] = Depends(get_current_user)):
     """
-    Скачивает все акты по задаче и возвращает ZIP.
-    Если какой-то акт недоступен, кладём в архив .txt с ошибкой/ссылкой.
+    He downloads all the actions on the task and returns the ZIP.
+    If any act is unavailable, we put in the .txt archive with error/link.
     """
     async with httpx.AsyncClient(timeout=60.0) as client:
         db_response = await client.get(f"{DATABASE_SERVICE_URL}/api/results/{task_id}", timeout=30.0)
@@ -371,11 +371,11 @@ class ClearDatabaseRequest(BaseModel):
 @app.post("/api/admin/clear")
 async def admin_clear_database(request: ClearDatabaseRequest, current_user: Dict[str, Any] = Depends(require_admin), token: str = Depends(oauth2_scheme)):
     """
-    Proxy к database_service: очистка БД по кнопке.
-    Требует admin и передаёт JWT в database_service для авторизации.
+    Proxie to database_service: Bottle-cleaning of database.
+    Requires admin and transmits JWT to database_service for authorization.
     """
-    print(f"[admin_clear_database] Запрос от пользователя: {current_user.get('username')}, роли: {current_user.get('roles')}")
-    print(f"[admin_clear_database] Параметры: scope={request.scope}, task_id={request.task_id}, include_search_logs={request.include_search_logs}")
+    print(f"[admin_clear_database] User request: {current_user.get('username')}, roles: {current_user.get('roles')}")
+    print(f"[admin_clear_database] Parameters: scope={request.scope}, task_id={request.task_id}, include_search_logs={request.include_search_logs}")
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             resp = await client.post(
@@ -385,38 +385,38 @@ async def admin_clear_database(request: ClearDatabaseRequest, current_user: Dict
             )
 
         if resp.status_code != 200:
-            print(f"[admin_clear_database] Ошибка от database_service: {resp.status_code} - {resp.text}")
+            print(f"[admin_clear_database] Error from database_service: {resp.status_code} - {resp.text}")
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         result = resp.json()
-        print(f"[admin_clear_database] База успешно очищена: {result}")
+        print(f"[admin_clear_database] Base successfully cleared: {result}")
         return result
     except Exception as e:
-        print(f"[admin_clear_database] Исключение: {e}")
+        print(f"[admin_clear_database] Exemption: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/admin/cache/clear")
 async def admin_clear_cache(current_user: Dict[str, Any] = Depends(require_admin)):
     """
-    Очистка Redis кэша (flushdb) через cache_service.
-    Требует роль admin.
+    Cleaning of Redis Cash (flushdb) via cache_service.
+    It requires an admin role.
     """
-    print(f"[admin_clear_cache] Запрос от пользователя: {current_user.get('username')}, роли: {current_user.get('roles')}")
+    print(f"[admin_clear_cache] User request: {current_user.get('username')}, roles: {current_user.get('roles')}")
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
             resp = await client.get(f"{CACHE_SERVICE_URL}/cache/clear")
         if resp.status_code != 200:
-            print(f"[admin_clear_cache] Ошибка от cache_service: {resp.status_code} - {resp.text}")
+            print(f"[admin_clear_cache] Error from cache_service: {resp.status_code} - {resp.text}")
             raise HTTPException(status_code=resp.status_code, detail=resp.text)
         result = resp.json()
-        print(f"[admin_clear_cache] Кэш успешно очищен: {result}")
+        print(f"[admin_clear_cache] Cash has been successfully cleared: {result}")
         return result
     except Exception as e:
-        print(f"[admin_clear_cache] Исключение: {e}")
+        print(f"[admin_clear_cache] Exemption: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/search")
 async def search(request: SearchRequest, background_tasks: BackgroundTasks, current_user: Dict[str, Any] = Depends(get_current_user)):
-    """Создать задачу на поиск судебных актов"""
+    'Create a task to search for judicial acts'
     task_id = str(uuid.uuid4())
     cache_key = f"search:{request.search_type}:{request.query}"
     
@@ -428,27 +428,27 @@ async def search(request: SearchRequest, background_tasks: BackgroundTasks, curr
         "cache_key": cache_key,
     })
     
-    # Запускаем обработку в фоне
+    # Start processing in background
     background_tasks.add_task(process_search_task, task_id, request)
     
     return {"task_id": task_id, "status": "pending"}
 
 async def process_search_task(task_id: str, request: SearchRequest):
-    """Асинхронная обработка задачи поиска"""
+    'Asynchronous search task processing'
     started = time.perf_counter()
     try:
-        print(f"[{task_id}] Начало обработки задачи поиска: {request.query}")
+        print(f"[{task_id}] Start of search task processing: {request.query}")
         current = await _get_task_status(task_id) or {}
         current.update({"status": "processing"})
         await _set_task_status(task_id, current)
         cache_key = current.get("cache_key") or f"search:{request.search_type}:{request.query}"
 
-        # Поддержка нескольких запросов через запятую (ТЗ п.3.1)
+        # Support multiple requests through a comma (T3.1)
         queries = [q.strip() for q in (request.query or "").split(",") if q.strip()]
         if not queries:
             queries = [request.query]
 
-        # Логируем старт запроса (не критично при ошибке)
+        # Start the request (not critical in case of error))
         try:
             async with httpx.AsyncClient(timeout=5.0) as log_client:
                 await log_client.post(
@@ -463,7 +463,7 @@ async def process_search_task(task_id: str, request: SearchRequest):
         except Exception as log_err:
             print(f"[{task_id}] Failed to create search log: {log_err}")
         
-        # Проверяем кэш (пропускаем при ошибках подключения)
+        # We check the cache (forgotten in connection errors))
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 cache_response = await client.get(
@@ -476,8 +476,8 @@ async def process_search_task(task_id: str, request: SearchRequest):
                     if cached_data.get("cached"):
                         cached_value = cached_data.get("value") or {}
 
-                        # Критично: при cache-hit нужно либо вернуть данные из кэша,
-                        # либо сохранить их в БД под новый task_id — иначе /results и экспорт сломаются.
+                        # Critic: Cache-hit needs to either return the data from the cache,
+                        # or keep them in database under the new task_id — otherwise / results and exports will break.
                         try:
                             await client.post(
                                 f"{DATABASE_SERVICE_URL}/api/results/save",
@@ -495,7 +495,7 @@ async def process_search_task(task_id: str, request: SearchRequest):
                         current.update({"status": "completed", "completed_at": datetime.now(), "error": None})
                         await _set_task_status(task_id, current)
 
-                        # обновляем аудит-лог (best-effort)
+                        # updated audit log (best-effort)
                         try:
                             duration_ms = int((time.perf_counter() - started) * 1000)
                             await client.post(
@@ -514,18 +514,18 @@ async def process_search_task(task_id: str, request: SearchRequest):
                             pass
                         return
         except Exception as cache_error:
-            # Продолжаем без кэша при ошибке подключения
+            # Continuing without cash in case of connection error
             print(f"Cache service unavailable, continuing without cache: {cache_error}")
             pass
         
-        # Получаем данные из Casebook API (по каждому подзапросу)
+        # Get data from Casebook API (for each sub-request)
         async with httpx.AsyncClient() as client:
             aggregated_results = []
 
             for q in queries:
                 per_query_cache_key = f"search:{request.search_type}:{q}"
 
-                # Пытаемся взять готовый результат из кэша для подзапроса
+                # Trying to get the final result from the cache for the subpoena.
                 per_cached = None
                 try:
                     per_cache_resp = await client.get(
@@ -542,14 +542,14 @@ async def process_search_task(task_id: str, request: SearchRequest):
 
                 if per_cached and isinstance(per_cached, dict) and per_cached.get("results") is not None:
                     per_results = per_cached.get("results", [])
-                    # КРИТИЧНО: Результаты из кэша БЕЗ act_text - нужно загрузить полный текст для LLM
-                    # Загружаем act_text через pravo_api_service для каждого результата
+                    # CRITICAL: Cache results without act_text - full text for LLM must be downloaded
+                    # Upload act_text via pravo_api_service for each result
                     for r in per_results:
                         if isinstance(r, dict):
                             meta = dict(r.get("metadata") or {})
                             meta["source_query"] = q
                             r["metadata"] = meta
-                            # Загружаем полный текст документа для LLM обработки
+                            # Upload the full text of the document for LLM processing
                             case_id = meta.get("case_id")
                             document_id = meta.get("document_id")
                             if case_id and document_id and not r.get("act_text"):
@@ -563,11 +563,11 @@ async def process_search_task(task_id: str, request: SearchRequest):
                                         enrich_data = enrich_response.json()
                                         r["act_text"] = enrich_data.get("act_text", "")
                                 except Exception as enrich_err:
-                                    logger.warning(f"[{task_id}] Не удалось загрузить act_text для {case_id}/{document_id}: {enrich_err}")
+                                    logger.warning(f"[{task_id}] Unable to load act_text for {case_id}/{document_id}: {enrich_err}")
                     aggregated_results.extend(per_results)
                     continue
 
-                # Запрашиваем данные из Casebook API
+                # Request data from Casebook API
                 casebook_response = await client.post(
                     f"{CASEBOOK_API_SERVICE_URL}/api/search",
                     json={"query": q, "search_type": request.search_type},
@@ -579,27 +579,27 @@ async def process_search_task(task_id: str, request: SearchRequest):
 
                 casebook_data = casebook_response.json()
                 casebook_results = casebook_data.get('results', [])
-                logger.info(f"[{task_id}] Получено результатов из Casebook API для '{q}': {len(casebook_results)}")
-                print(f"[{task_id}] Получено результатов из Casebook API для '{q}': {len(casebook_results)}")
+                logger.info(f"[{task_id}] Results from Casebook API for '{q}': {len(casebook_results)}")
+                print(f"[{task_id}] Results from Casebook API for '{q}': {len(casebook_results)}")
                 
-                # КРИТИЧНО: Проверяем наличие act_text в результатах ДО отправки в data_processing
+                # CRITICAL: Check the presence of act_text in the results prior to shipment to data_processing
                 for idx, result in enumerate(casebook_results):
                     act_text = result.get('act_text', '')
                     case_number = result.get('case_number', 'unknown')
-                    logger.info(f"[{task_id}] Результат {idx} ({case_number}): act_text присутствует={bool(act_text)}, длина={len(act_text) if act_text else 0}")
-                    print(f"[{task_id}] Результат {idx} ({case_number}): act_text присутствует={bool(act_text)}, длина={len(act_text) if act_text else 0}")
+                    logger.info(f"[{task_id}] Result {idx} ({case_number}): act_text present={bool(act_text)}, length={len(act_text) if act_text else 0}")
+                    print(f"[{task_id}] Result {idx} ({case_number}): act_text present={bool(act_text)}, length={len(act_text) if act_text else 0}")
                     if not act_text:
-                        logger.error(f"[{task_id}] КРИТИЧНО: Результат {idx} ({case_number}): act_text ОТСУТСТВУЕТ! LLM не сможет обработать это дело!")
-                        print(f"[{task_id}] КРИТИЧНО: Результат {idx} ({case_number}): act_text ОТСУТСТВУЕТ! LLM не сможет обработать это дело!")
+                        logger.error(f"[{task_id}] CRITICAL: Result {idx} ({case_number}): act_text EXISTED! LLM won't be able to process this case!")
+                        print(f"[{task_id}] CRITICAL: Result {idx} ({case_number}): act_text EXISTED! LLM won't be able to process this case!")
                     elif len(act_text) < 100:
-                        logger.warning(f"[{task_id}] Результат {idx} ({case_number}): act_text слишком короткий ({len(act_text)} символов), возможно это не полный текст")
-                        print(f"[{task_id}] Результат {idx} ({case_number}): act_text слишком короткий ({len(act_text)} символов), возможно это не полный текст")
+                        logger.warning(f"[{task_id}] Result {idx} ({case_number}): act_text too short{len(act_text)} (i.e. symbols) may not be the full text")
+                        print(f"[{task_id}] Result {idx} ({case_number}): act_text too short{len(act_text)} (i.e. symbols) may not be the full text")
                     else:
-                        logger.info(f"[{task_id}] Результат {idx} ({case_number}): первые 200 символов act_text: {act_text[:200]}")
-                        print(f"[{task_id}] Результат {idx} ({case_number}): первые 200 символов act_text: {act_text[:200]}")
+                        logger.info(f"[{task_id}] Result {idx} ({case_number}): the first 200 act_text characters: {act_text[:200]}")
+                        print(f"[{task_id}] Result {idx} ({case_number}): the first 200 act_text characters: {act_text[:200]}")
 
-                # Отправляем на обработку данных
-                print(f"[{task_id}] Отправка запроса на обработку данных в {DATA_PROCESSING_SERVICE_URL}/api/process (query='{q}')")
+                # Sending for data processing
+                print(f"[{task_id}] Sending a request for data processing to {DATA_PROCESSING_SERVICE_URL}/api/process (query='{q}')")
                 try:
                     import traceback
                     processing_response = await client.post(
@@ -613,7 +613,7 @@ async def process_search_task(task_id: str, request: SearchRequest):
                     )
                 except Exception as proc_error:
                     error_traceback = traceback.format_exc()
-                    print(f"[{task_id}] ОШИБКА при запросе к data_processing (query='{q}'): {proc_error}")
+                    print(f"[{task_id}] Error when requested to data_processing (query)='{q}'): {proc_error}")
                     print(f"[{task_id}] Traceback: {error_traceback}")
                     raise
 
@@ -629,14 +629,14 @@ async def process_search_task(task_id: str, request: SearchRequest):
                         r["metadata"] = meta
                 aggregated_results.extend(per_results)
 
-                # Кэшируем результат конкретного подзапроса (БЕЗ act_text - он слишком большой)
+                # Cashing the result of a specific sub-demand (ZEZ act_text - it's too big))
                 try:
                     safe_results = []
                     for r in per_results:
                         if not isinstance(r, dict):
                             continue
                         safe_r = dict(r)
-                        safe_r.pop("act_text", None)  # Не храним полный текст в кэше
+                        safe_r.pop("act_text", None)  # Do not store full text in the Cash
                         safe_results.append(safe_r)
                     await client.post(
                         f"{CACHE_SERVICE_URL}/cache/set",
@@ -651,11 +651,11 @@ async def process_search_task(task_id: str, request: SearchRequest):
                     pass
 
             processing_result = {"task_id": task_id, "results": aggregated_results, "status": "completed"}
-            print(f"[{task_id}] Агрегация завершена, всего результатов: {len(processing_result.get('results', []))}")
+            print(f"[{task_id}] Aggregation completed, all results: {len(processing_result.get('results', []))}")
             
-            # Фильтрация дубликатов:
-            # по ТЗ мы не должны терять несколько актов в одном деле,
-            # поэтому дедуплицируем по акту (URL), а не по номеру дела.
+            # Duplicate filtering:
+            # On TK, we shouldn't lose a few acts in one case,
+            # So, grandpa's by act (URL) rather than by case number.
             unique_acts = {}
             for result in processing_result.get("results", []):
                 act_url = (result.get("act_url") or "").strip()
@@ -671,7 +671,7 @@ async def process_search_task(task_id: str, request: SearchRequest):
             
             processing_result["results"] = list(unique_acts.values())
             
-            # Сохраняем в базу данных
+            # Keep it in the database.
             await client.post(
                 f"{DATABASE_SERVICE_URL}/api/results/save",
                 json={
@@ -681,7 +681,7 @@ async def process_search_task(task_id: str, request: SearchRequest):
                 timeout=30.0
             )
 
-            # Получаем агрегированные счетчики (unique cases / total mentions) и пишем в аудит-лог
+            # We get the aggregate counters (unique cases/total agencies) and write them to the audit log
             unique_cases_count = 0
             try:
                 unique_cases = set()
@@ -692,14 +692,14 @@ async def process_search_task(task_id: str, request: SearchRequest):
             except Exception:
                 unique_cases_count = 0
             
-            # Кэшируем результат (БЕЗ act_text - он слишком большой для кэша)
+            # Cashing the result (act_text - it's too big for the cache))
             try:
                 safe_results = []
                 for r in processing_result.get("results", []):
                     if not isinstance(r, dict):
                         continue
                     safe_r = dict(r)
-                    safe_r.pop("act_text", None)  # Не храним полный текст в кэше
+                    safe_r.pop("act_text", None)  # Do not store full text in the Cash
                     safe_results.append(safe_r)
                 await client.post(
                     f"{CACHE_SERVICE_URL}/cache/set",
@@ -718,7 +718,7 @@ async def process_search_task(task_id: str, request: SearchRequest):
             current = await _get_task_status(task_id) or {}
             current.update({"status": "completed", "completed_at": datetime.now(), "error": None})
             await _set_task_status(task_id, current)
-            print(f"[{task_id}] Задача успешно завершена")
+            print(f"[{task_id}] The task has been successfully completed")
 
             try:
                 duration_ms = int((time.perf_counter() - started) * 1000)
@@ -747,7 +747,7 @@ async def process_search_task(task_id: str, request: SearchRequest):
         current.update({"status": "failed", "error": error_msg, "completed_at": datetime.now()})
         await _set_task_status(task_id, current)
 
-        # best-effort аудит-лог
+        # Best-effort audit log
         try:
             duration_ms = int((time.perf_counter() - started) * 1000)
             async with httpx.AsyncClient(timeout=5.0) as client:
@@ -768,7 +768,7 @@ async def process_search_task(task_id: str, request: SearchRequest):
 
 @app.get("/api/search/status/{task_id}")
 async def get_search_status(task_id: str, current_user: Dict[str, Any] = Depends(get_current_user)):
-    """Получить статус задачи поиска"""
+    'Get a search task status'
     status_data = await _get_task_status(task_id)
     if not status_data:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -782,14 +782,14 @@ async def get_search_status(task_id: str, current_user: Dict[str, Any] = Depends
 
 @app.get("/api/search/results/{task_id}")
 async def get_search_results(task_id: str, current_user: Dict[str, Any] = Depends(get_current_user)):
-    """Получить результаты поиска"""
+    'Get search results.'
     status_data = await _get_task_status(task_id)
     if not status_data:
         raise HTTPException(status_code=404, detail="Task not found")
     if status_data["status"] != "completed":
         raise HTTPException(status_code=400, detail="Task not completed yet")
     
-    # Получаем результаты из базы данных
+    # Get results from the database.
     async with httpx.AsyncClient() as client:
         db_response = await client.get(
             f"{DATABASE_SERVICE_URL}/api/results/{task_id}",
@@ -803,11 +803,11 @@ async def get_search_results(task_id: str, current_user: Dict[str, Any] = Depend
 
 @app.get("/api/export/{task_id}")
 async def export_results(task_id: str, format: str = "excel", current_user: Dict[str, Any] = Depends(get_current_user)):
-    """Экспортировать результаты в файл"""
+    'Export results to file'
     if format not in ["excel", "pdf", "json"]:
         raise HTTPException(status_code=400, detail="Invalid format. Use: excel, pdf, or json")
     
-    # Получаем результаты из базы данных
+    # Get results from the database.
     async with httpx.AsyncClient() as client:
         db_response = await client.get(
             f"{DATABASE_SERVICE_URL}/api/results/{task_id}",
@@ -819,7 +819,7 @@ async def export_results(task_id: str, format: str = "excel", current_user: Dict
         
         results_data = db_response.json()
         
-        # Экспортируем через File Export Service
+        # Export via File Export Service
         export_response = await client.post(
             f"{FILE_EXPORT_SERVICE_URL}/api/export",
             json={
@@ -835,7 +835,7 @@ async def export_results(task_id: str, format: str = "excel", current_user: Dict
         
         from fastapi.responses import Response
         
-        # Возвращаем ответ напрямую от File Export Service
+        # Return the answer directly from File Export Service
         content_type = export_response.headers.get("content-type", "application/octet-stream")
         content_disposition = export_response.headers.get("content-disposition", 
             f'attachment; filename="document_intelligence_results_{task_id}.{format if format != "excel" else "xlsx"}"')
@@ -848,11 +848,11 @@ async def export_results(task_id: str, format: str = "excel", current_user: Dict
 
 @app.get("/api/translations")
 async def get_translations():
-    """Получение переводов для фронтенда"""
+    'Remittances received for the Frontend'
     import json
     from pathlib import Path
     
-    # Ищем файл переводов в разных местах
+    # We're looking for a translation file in different places.
     possible_paths = [
         Path("/app/backend/utils/translations.json"),
         Path(__file__).parent.parent / "utils" / "translations.json",
@@ -867,7 +867,7 @@ async def get_translations():
             except Exception as e:
                 print(f"Error loading translations from {path}: {e}")
     
-    # Fallback: возвращаем базовые переводы
+    # Fallback: Return basic translations
     return {
         "side_types": {
             "plaintiff": "истец",
@@ -875,27 +875,27 @@ async def get_translations():
             "defendant": "ответчик",
             "debtor": "должник",
             "thirdPerson": "третье лицо",
-            "other": "иное лицо",
-            "all": "все"
+            "other": 'Other person',
+            "all": 'All'
         },
         "classification_types": {
-            "участник": "Участник дела",
-            "упомянутое лицо": "Упомянутое лицо",
-            "контрагент": "Контрагент",
-            "аффилированное лицо": "Аффилированное лицо",
-            "истец": "Истец",
-            "ответчик": "Ответчик",
-            "третье лицо": "Третье лицо",
-            "кредитор": "Кредитор",
-            "должник": "Должник",
-            "не найдено": "Не найдено",
-            "не определено": "Не определено"
+            "участник": 'Case participant',
+            "упомянутое лицо": 'The person in question',
+            "контрагент": 'Contractor',
+            "аффилированное лицо": 'Affiliated person',
+            "истец": 'The plaintiff',
+            "ответчик": 'Defendant',
+            "третье лицо": 'Third person',
+            "кредитор": 'Creditor',
+            "должник": 'Debtor',
+            "не найдено": 'Not found',
+            "не определено": 'Undefined'
         }
     }
 
 @app.get("/health")
 async def health():
-    """Проверка здоровья сервиса"""
+    'Service health check'
     return {"status": "healthy", "service": "api_gateway"}
 
 if __name__ == "__main__":

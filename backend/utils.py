@@ -36,9 +36,9 @@ def _resolve_settings_env(value):
 
 def _decrypt_settings_payload(payload: Dict[str, Any], passphrase: str) -> Dict[str, Any]:
     """
-    Дешифрует содержимое settings.json.enc.
+    Deciphers the content of settings.json.enc.
 
-    Формат:
+    Format:
     {
       "v": 1,
       "kdf": "pbkdf2-sha256",
@@ -76,15 +76,15 @@ def _decrypt_settings_payload(payload: Dict[str, Any], passphrase: str) -> Dict[
     return _resolve_settings_env(json.loads(plaintext.decode("utf-8")))
 
 def load_settings():
-    """Загрузка настроек из settings.json"""
+    'Loading settings from settings.json'
     current_file = Path(__file__)
-    # В Docker контейнере файл монтируется как /settings.json
-    # Локально - в корне проекта
+    # In the Docker container, the file is mounted as /settings.json
+    # Locally, at the root of the project.
     possible_plain_paths = [
-        Path("/settings.json"),  # Docker контейнер (монтируется из docker-compose)
-        current_file.parent.parent / "settings.json",  # В корне проекта (локально)
-        current_file.parent / "settings.json",  # Рядом с utils.py
-        Path("/app/settings.json"),  # Альтернативный путь в Docker
+        Path("/settings.json"),  # Docker container (mounted from docker-composite)
+        current_file.parent.parent / "settings.json",  # At the root of the project (local)
+        current_file.parent / "settings.json",  # Near utils.py
+        Path("/app/settings.json"),  # Alternative to Docker
     ]
 
     possible_enc_paths = [
@@ -96,7 +96,7 @@ def load_settings():
     
     settings_path = None
 
-    # 1) Пытаемся прочитать зашифрованный файл (предпочтительно)
+    # (1) Trying to read an encrypted file (preferably))
     for path in possible_enc_paths:
         if path.exists():
             settings_path = path
@@ -110,25 +110,25 @@ def load_settings():
             payload = _resolve_settings_env(json.load(f))
         return _decrypt_settings_payload(payload, passphrase)
 
-    # 2) Иначе читаем plaintext settings.json
+    # (2) Otherwise read tabletext settings.json
     for path in possible_plain_paths:
         if path.exists():
             settings_path = path
             break
 
     if not settings_path:
-        raise FileNotFoundError(f"Файл settings.json(.enc) не найден. Проверены пути: {possible_enc_paths + possible_plain_paths}")
+        raise FileNotFoundError(f"settings.json(.enc) file not found. Paths checked: {possible_enc_paths + possible_plain_paths}")
 
     with open(settings_path, "r", encoding="utf-8-sig") as f:
         return _resolve_settings_env(json.load(f))
 
 def get_openai_api_key():
-    """Получение OpenAI API ключа из settings.json"""
+    'Receive OpenAI API key from settings.json'
     settings = load_settings()
     return settings.get("openai", {}).get("api_key", "")
 
 def get_casebook_api_key():
-    """Получение Casebook API ключа из settings.json (устаревший метод, для обратной совместимости)"""
+    'Collection of settings.json Key Casebook API)'
     env_key = os.getenv("CASEBOOK_API_KEY") or os.getenv("DOCUMENT_INTELLIGENCE_CASEBOOK_API_KEY")
     if env_key:
         return env_key
@@ -136,7 +136,7 @@ def get_casebook_api_key():
     return settings.get("casebook", {}).get("api_key", "")
 
 def get_casebook_username():
-    """Получение логина для Casebook API из settings.json"""
+    'Get Logic for Casebook API from settings.json'
     env_username = os.getenv("CASEBOOK_USERNAME") or os.getenv("DOCUMENT_INTELLIGENCE_CASEBOOK_USERNAME")
     if env_username:
         return env_username
@@ -144,7 +144,7 @@ def get_casebook_username():
     return settings.get("casebook", {}).get("username", "")
 
 def get_casebook_password():
-    """Получение пароля для Casebook API из settings.json"""
+    'Obtain password for Casebook API from settings.json'
     env_password = os.getenv("CASEBOOK_PASSWORD") or os.getenv("DOCUMENT_INTELLIGENCE_CASEBOOK_PASSWORD")
     if env_password:
         return env_password
@@ -152,7 +152,7 @@ def get_casebook_password():
     return settings.get("casebook", {}).get("password", "")
 
 def get_casebook_base_url():
-    """Получение Casebook API базового URL из settings.json"""
+    'Receive Casebook API basic URL from settings.json'
     env_url = os.getenv("CASEBOOK_BASE_URL") or os.getenv("DOCUMENT_INTELLIGENCE_CASEBOOK_BASE_URL")
     if env_url:
         return env_url
@@ -161,10 +161,10 @@ def get_casebook_base_url():
 
 def get_proxy_config() -> Dict[str, Any]:
     """
-    Читает настройки прокси из env или settings.json.
+    Reads proxie settings from env or settings.json.
 
-    Приоритет:
-    - env: OPENAI_HTTP_PROXY / OPENAI_HTTPS_PROXY (или стандартные HTTP_PROXY/HTTPS_PROXY)
+    Priority:
+    - env: OPENAI_HTTP_PROXY / OPENAI_HTTPS_PROXY (or standard HTTP_PROXY/HTTPS_PROXY)
     - settings.json: network.proxy
     """
     cfg: Dict[str, Any] = {"enabled": False, "http": "", "https": "", "no_proxy": ""}
@@ -194,8 +194,8 @@ def get_proxy_config() -> Dict[str, Any]:
 
 def apply_openai_proxy_env() -> None:
     """
-    Настраивает прокси на уровне переменных окружения для HTTPX/OpenAI SDK.
-    Вызывайте ДО создания клиента OpenAI.
+    Sets Proxi at HTTPX/OpenAI SDK level of variables.
+    Call OpenAI before you create the client.
     """
     cfg = get_proxy_config()
     if not cfg.get("enabled"):

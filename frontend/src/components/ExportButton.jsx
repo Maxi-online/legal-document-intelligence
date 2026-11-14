@@ -25,8 +25,8 @@ const ExportButton = ({ taskId }) => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Ошибка при экспорте:', error);
-      alert('Ошибка при экспорте данных. Попробуйте еще раз.');
+      console.error('Errors in Export:', error);
+      alert('Errors in data export. Try again.');
     } finally {
       setIsExporting(false);
     }
@@ -52,12 +52,12 @@ const ExportButton = ({ taskId }) => {
         {isExporting ? (
           <>
             <Loader2 className="animate-spin" size={18} />
-            Экспорт...
+            Export...
           </>
         ) : (
           <>
             <Download size={18} />
-            Экспорт
+            Exports
           </>
         )}
       </button>

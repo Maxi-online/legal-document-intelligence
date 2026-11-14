@@ -49,7 +49,7 @@ def main():
     in_path = Path(args.in_path)
     out_path = Path(args.out_path)
 
-    # На Windows PowerShell иногда пишет JSON с BOM → читаем как utf-8-sig
+    # On Windows PowerShell sometimes writes JSON with BOM ♪ Read as utf-8-sig
     plain = json.loads(in_path.read_text(encoding="utf-8-sig"))
     enc = encrypt_settings(plain, passphrase, args.iterations)
     out_path.write_text(json.dumps(enc, ensure_ascii=False, indent=2), encoding="utf-8")
