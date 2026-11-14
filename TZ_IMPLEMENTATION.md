@@ -4,7 +4,7 @@
 
 **Project**: Search for references to natural and legal persons in judicial acts  
 **API**: Casebook API 3.0 (instead of the Law.ru API specified in TK))  
-**Architecture**: Microservice Architecture at FastAPI, Cellery, PostgreSQL, Redis
+**Architecture**: Microservice Architecture at FastAPI, Celery, PostgreSQL, Redis
 
 ---
 
@@ -35,11 +35,11 @@
 ## 2. Main idea and contrast to standard search
 
 ### The requirement for TK
-| Parameter ♪ Arbitral files ♪ The designer program ♪ |
+| Parameter | Arbitration files | Programme under development |
 |----------|---------------------------|---------------------------|
-| The basis for the search is that only the parties to the case have any reference in the text of the judicial act |
-| Data envelope ♪ Subtotal cases ♪ Full text index of certificates ♪ |
-| Result : Case number, court, date, parties ♪ + context of reference, role, link, downloadable act |
+| Basis of Search | Only participants in the case | Any reference in the text of a judicial act |
+| Data acquisition | Case metadata | Full text index of acts |
+| Result | Case number, court, date, parties | + Context of reference, role, reference, downloadable act |
 
 ### Implementation
 ✅ **Fully implemented**
@@ -186,7 +186,7 @@
 
 #### The requirement for TK
 The results are presented as a table:
-| № | Court No. Case No. . Date of act . Type of reference . . Context (fragment) . Reference |
+| № | Court | № Cases | Date of act | Type of reference | Context (fragment) | Link |
 |---|-----|--------|-----------|----------------|---------------------|--------|
 
 In addition, the account of the references found and the number of unique cases where the face is found.
@@ -236,18 +236,18 @@ In addition, the account of the references found and the number of unique cases 
 
 ---
 
-## 4. Architecture and Walls
+## 4. Architecture and layers
 
 ### The requirement for TK
-| Component . . . Technology |
+| Component | Technology |
 |-----------|------------|
 | Backend | Python 3.11+, FastAPI |
-| Requests for API httpx/requests with support for currents Right |
-| Parsing text \ Standard JSON/HTML Parser API, BeautifulSoup if necessary |
-| Warehouse ♪ PostgreSQL / SQLite |
-== sync, corrected by elderman == @elder_man
-| Export \openpyxl, reportlab |
-| Logging and cacheing \\Redis or built-in SQLite cache |
+| Requests to API | httpx / requests with the support of the Tokens Right |
+| Parsing Text | Standard JSON/HTML-Parser API, BeautifulSoup If necessary |
+| Warehouse | PostgreSQL / SQLite |
+| Frontend (optional) | React + shadcn/ui |
+| Exports | openpyxl, reportlab |
+| Logging and Cashing | Redis or integrated SQLite cache |
 
 ### Implementation
 ✅ **Implemented with extensions**
