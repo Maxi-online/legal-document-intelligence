@@ -2,11 +2,11 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-# Копируем только package файлы для установки зависимостей
+# Copy only package files to set relationships
 COPY package.json package-lock.json ./
 RUN npm install
 
-# Копируем только исходники (node_modules уже установлен, не копируем)
+# Copy only the source (node_modules already installed, do not copy)
 COPY src ./src
 COPY public ./public
 COPY index.html ./

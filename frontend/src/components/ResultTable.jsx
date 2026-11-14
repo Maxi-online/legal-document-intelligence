@@ -48,7 +48,7 @@ const ResultTable = ({ results, filters, highlightTerms = [] }) => {
   const translateType = (type) => {
     if (!type || !translations) return type;
     const sideTypes = translations.side_types || {};
-    // Обрабатываем значения с запятыми (например, "debtor,creditor")
+    // Precise values shall be processed (e.g. "debtor,creditor")
     const types = type.split(',').map(t => t.trim());
     const translated = types.map(t => {
       const lower = t.toLowerCase();
@@ -105,10 +105,10 @@ const ResultTable = ({ results, filters, highlightTerms = [] }) => {
 
   const getClassificationBadgeColor = (classification) => {
     const colors = {
-      'истец': 'bg-green-100 text-green-800',
-      'ответчик': 'bg-red-100 text-red-800',
-      'участник': 'bg-blue-100 text-blue-800',
-      'контрагент': 'bg-yellow-100 text-yellow-800',
+      'Claimant': 'bg-green-100 text-green-800',
+      'respondent': 'bg-red-100 text-red-800',
+      'State party': 'bg-blue-100 text-blue-800',
+      'counterparty': 'bg-yellow-100 text-yellow-800',
     };
     return colors[classification?.toLowerCase()] || 'bg-gray-100 text-gray-800';
   };
@@ -122,40 +122,40 @@ const ResultTable = ({ results, filters, highlightTerms = [] }) => {
               className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
               onClick={() => handleSort('case_number')}
             >
-              Номер дела
+              Case number
             </th>
             <th
               className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
               onClick={() => handleSort('court')}
             >
-              Суд
+              Court
             </th>
             <th
               className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
               onClick={() => handleSort('date')}
             >
-              Дата акта
+              Date of act
             </th>
             <th
               className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100"
               onClick={() => handleSort('ingested_at')}
             >
-              Дата загрузки
+              Loading date
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-              Тип упоминания
+              Type of reference
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-              Классификация
+              Classification
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-              Релевантность
+              Relevance
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-              Контекст
+              Context
             </th>
             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-              Действия
+              Actions
             </th>
           </tr>
         </thead>
@@ -163,7 +163,7 @@ const ResultTable = ({ results, filters, highlightTerms = [] }) => {
           {filteredResults.length === 0 ? (
             <tr>
               <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
-                Результаты не найдены
+                No results found
               </td>
             </tr>
           ) : (
@@ -191,7 +191,7 @@ const ResultTable = ({ results, filters, highlightTerms = [] }) => {
                         result.classification
                       )}`}
                     >
-                      {result.classification || 'Не указано'}
+                      {result.classification || 'Not specified'}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
@@ -212,7 +212,7 @@ const ResultTable = ({ results, filters, highlightTerms = [] }) => {
                           className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
                         >
                           <ExternalLink size={16} />
-                          Открыть
+                          Open
                         </a>
                       )}
                       <button
@@ -235,14 +235,14 @@ const ResultTable = ({ results, filters, highlightTerms = [] }) => {
                     <td colSpan="9" className="px-4 py-4 bg-gray-50">
                       <div className="space-y-2">
                         <div>
-                          <strong>Контекст упоминания:</strong>
+                          <strong>Context of reference:</strong>
                           <p className="mt-1 text-sm text-gray-700 whitespace-pre-wrap">
-                            <HighlightedText text={result.context || 'Не указано'} terms={highlightTerms} />
+                            <HighlightedText text={result.context || 'Not specified'} terms={highlightTerms} />
                           </p>
                         </div>
                         {result.ingested_at && (
                           <div>
-                            <strong>Загружено в базу:</strong>
+                            <strong>Loaded to base:</strong>
                             <p className="mt-1 text-sm text-gray-700">
                               {format(new Date(result.ingested_at), 'dd.MM.yyyy')}
                             </p>
@@ -250,7 +250,7 @@ const ResultTable = ({ results, filters, highlightTerms = [] }) => {
                         )}
                         {result.parties && (
                           <div>
-                            <strong>Стороны дела:</strong>
+                            <strong>Parties to the case:</strong>
                             <p className="mt-1 text-sm text-gray-700">{translateParties(result.parties)}</p>
                           </div>
                         )}

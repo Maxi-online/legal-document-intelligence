@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Важно: при деплое через nginx (frontend container) API доступен по относительному пути `/api`.
-// Если оставить дефолт `http://localhost:8000`, то в браузере пользователя "localhost" будет его ПК, а не сервер.
+// Its important to do it through nginx (frontend container) API Available on a Relative Way `/api`.
+// If you leave the default. `http://localhost:8000`, in the user browser. "localhost" Itll be his PC, not his server.
 const API_URL = import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || '';
 
 const apiClient = axios.create({
@@ -16,9 +16,9 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers = config.headers || {};
     config.headers.Authorization = `Bearer ${token}`;
-    console.log(`[API] Запрос к ${config.url} с токеном: ${token.substring(0, 20)}...`);
+    console.log(`[API] Request ${config.url} with current: ${token.substring(0, 20)}...`);
   } else {
-    console.warn(`[API] Запрос к ${config.url} БЕЗ токена`);
+    console.warn(`[API] Request ${config.url} Free of electron`);
   }
   return config;
 });
@@ -27,10 +27,10 @@ apiClient.interceptors.response.use(
   (resp) => resp,
   (error) => {
     if (error?.response?.status === 401) {
-      console.error('401 Unauthorized - токен невалидный или отсутствует');
+      console.error('401 Unauthorized - No or no current');
       console.error('Response:', error?.response?.data);
       localStorage.removeItem('access_token');
-      // Перенаправляем на страницу логина только если это не запрос логина
+      // Rerouted to a page is logical only if it is not a request for logic
       if (!error.config?.url?.includes('/auth/login')) {
         window.location.href = '/login';
       }
@@ -47,7 +47,7 @@ export const login = async ({ username, password }) => {
     }
     return response.data;
   } catch (error) {
-    throw error.response?.data || { error: 'Ошибка входа' };
+    throw error.response?.data || { error: 'Error of entrance' };
   }
 };
 
@@ -56,7 +56,7 @@ export const searchCases = async (searchParams) => {
     const response = await apiClient.post('/search', searchParams);
     return response.data;
   } catch (error) {
-    throw error.response?.data || { error: 'Ошибка при выполнении запроса' };
+    throw error.response?.data || { error: 'Error in fulfilling the request' };
   }
 };
 
@@ -65,7 +65,7 @@ export const getSearchStatus = async (taskId) => {
     const response = await apiClient.get(`/search/status/${taskId}`);
     return response.data;
   } catch (error) {
-    throw error.response?.data || { error: 'Ошибка при получении статуса' };
+    throw error.response?.data || { error: 'Error in obtaining status' };
   }
 };
 
@@ -74,7 +74,7 @@ export const getSearchResults = async (taskId) => {
     const response = await apiClient.get(`/search/results/${taskId}`);
     return response.data;
   } catch (error) {
-    throw error.response?.data || { error: 'Ошибка при получении результатов' };
+    throw error.response?.data || { error: 'Error in obtaining results' };
   }
 };
 
@@ -86,7 +86,7 @@ export const exportResults = async (taskId, format) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response?.data || { error: 'Ошибка при экспорте' };
+    throw error.response?.data || { error: 'Errors in Export' };
   }
 };
 
@@ -97,41 +97,41 @@ export const downloadAllActs = async (taskId) => {
     });
     return response.data;
   } catch (error) {
-    throw error.response?.data || { error: 'Ошибка при скачивании файлов' };
+    throw error.response?.data || { error: 'Error in downloading files' };
   }
 };
 
 export const clearDatabase = async ({ scope = 'all', task_id = null, include_search_logs = true }) => {
   try {
-    console.log('[clearDatabase] Отправка запроса на очистку базы:', { scope, task_id, include_search_logs });
+    console.log('[clearDatabase] Request for base clean-up:', { scope, task_id, include_search_logs });
     const token = localStorage.getItem('access_token');
-    console.log('[clearDatabase] Токен в localStorage:', token ? `${token.substring(0, 20)}...` : 'ОТСУТСТВУЕТ');
+    console.log('[clearDatabase] Token in localStorage:', token ? `${token.substring(0, 20)}...` : 'EXISTING');
     const response = await apiClient.post('/admin/clear', {
       scope,
       task_id,
       include_search_logs,
     });
-    console.log('[clearDatabase] Успешный ответ:', response.data);
+    console.log('[clearDatabase] Successful response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('[clearDatabase] Ошибка:', error);
+    console.error('[clearDatabase] mistake:', error);
     console.error('[clearDatabase] Response:', error.response?.data);
-    throw error.response?.data || { error: 'Ошибка при очистке базы' };
+    throw error.response?.data || { error: 'Errors in cleaning the base' };
   }
 };
 
 export const clearCache = async () => {
   try {
-    console.log('[clearCache] Отправка запроса на очистку кэша');
+    console.log('[clearCache] Send a request for cache cleaning');
     const token = localStorage.getItem('access_token');
-    console.log('[clearCache] Токен в localStorage:', token ? `${token.substring(0, 20)}...` : 'ОТСУТСТВУЕТ');
+    console.log('[clearCache] Token in localStorage:', token ? `${token.substring(0, 20)}...` : 'EXISTING');
     const response = await apiClient.post('/admin/cache/clear');
-    console.log('[clearCache] Успешный ответ:', response.data);
+    console.log('[clearCache] Successful response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('[clearCache] Ошибка:', error);
+    console.error('[clearCache] mistake:', error);
     console.error('[clearCache] Response:', error.response?.data);
-    throw error.response?.data || { error: 'Ошибка при очистке кэша' };
+    throw error.response?.data || { error: 'Errors in cleaning the cash' };
   }
 };
 

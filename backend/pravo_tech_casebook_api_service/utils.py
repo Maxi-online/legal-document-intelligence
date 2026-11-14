@@ -64,14 +64,14 @@ def _decrypt_settings_payload(payload: Dict[str, Any], passphrase: str) -> Dict[
     return _resolve_settings_env(json.loads(plaintext.decode("utf-8")))
 
 def load_settings():
-    """Загрузка настроек из settings.json"""
-    # Сначала проверяем в текущей директории (для Docker контейнеров)
+    'Loading settings from settings.json'
+    # First check in the current directory (for Docker containers))
     current_file = Path(__file__)
-    # В Docker контейнере файл может быть в /app/
+    # In the Docker container, the file can be in /app/
     possible_plain_paths = [
-        current_file.parent / "settings.json",  # Рядом с utils.py
-        Path("/app/settings.json"),  # В корне app директории (Docker)
-        current_file.parent.parent / "settings.json",  # В корне проекта (локально)
+        current_file.parent / "settings.json",  # Near utils.py
+        Path("/app/settings.json"),  # In the root of the app directory (Docker)
+        current_file.parent.parent / "settings.json",  # At the root of the project (local)
         Path("/settings.json"),
     ]
     possible_enc_paths = [
@@ -102,18 +102,18 @@ def load_settings():
             break
 
     if not settings_path:
-        raise FileNotFoundError(f"Файл settings.json(.enc) не найден. Проверенные пути: {possible_enc_paths + possible_plain_paths}")
+        raise FileNotFoundError(f"settings.json(.enc) file not found. Roads tested: {possible_enc_paths + possible_plain_paths}")
 
     with open(settings_path, "r", encoding="utf-8-sig") as f:
         return _resolve_settings_env(json.load(f))
 
 def get_openai_api_key():
-    """Получение OpenAI API ключа из settings.json"""
+    'Receive OpenAI API key from settings.json'
     settings = load_settings()
     return settings.get("openai", {}).get("api_key", "")
 
 def get_casebook_api_key():
-    """Получение Casebook API ключа из settings.json (устаревший метод, для обратной совместимости)"""
+    'Collection of settings.json Key Casebook API)'
     env_key = os.getenv("CASEBOOK_API_KEY") or os.getenv("DOCUMENT_INTELLIGENCE_CASEBOOK_API_KEY")
     if env_key:
         return env_key
@@ -121,7 +121,7 @@ def get_casebook_api_key():
     return settings.get("casebook", {}).get("api_key", "")
 
 def get_casebook_username():
-    """Получение логина для Casebook API из settings.json"""
+    'Get Logic for Casebook API from settings.json'
     env_username = os.getenv("CASEBOOK_USERNAME") or os.getenv("DOCUMENT_INTELLIGENCE_CASEBOOK_USERNAME")
     if env_username:
         return env_username
@@ -129,7 +129,7 @@ def get_casebook_username():
     return settings.get("casebook", {}).get("username", "")
 
 def get_casebook_password():
-    """Получение пароля для Casebook API из settings.json"""
+    'Obtain password for Casebook API from settings.json'
     env_password = os.getenv("CASEBOOK_PASSWORD") or os.getenv("DOCUMENT_INTELLIGENCE_CASEBOOK_PASSWORD")
     if env_password:
         return env_password
@@ -137,7 +137,7 @@ def get_casebook_password():
     return settings.get("casebook", {}).get("password", "")
 
 def get_casebook_base_url():
-    """Получение Casebook API базового URL из settings.json"""
+    'Receive Casebook API basic URL from settings.json'
     env_url = os.getenv("CASEBOOK_BASE_URL") or os.getenv("DOCUMENT_INTELLIGENCE_CASEBOOK_BASE_URL")
     if env_url:
         return env_url

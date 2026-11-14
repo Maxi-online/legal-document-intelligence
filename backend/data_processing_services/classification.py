@@ -5,7 +5,7 @@ import sys
 import logging
 from pathlib import Path
 
-# Добавляем путь к backend для импорта utils
+# Add a path to backend for the import of utils
 backend_path = str(Path(__file__).parent.parent.parent)
 if backend_path not in sys.path:
     sys.path.insert(0, backend_path)
@@ -15,7 +15,7 @@ from utils import apply_openai_proxy_env
 app = Celery('classification')
 app.config_from_object('celeryconfig')
 
-# Настраиваем логирование для Celery - используем root logger, который Celery уже настроил
+# We're setting the logic for Celery -- we're using the root logger that Celery has already set up
 logger = logging.getLogger(__name__)
 if not logger.handlers:
     handler = logging.StreamHandler()
@@ -35,59 +35,33 @@ def _get_client():
 @app.task
 def classify_mention(case_number: str, act_text: str, query: str) -> dict:
     """
-    Классификация роли упомянутого лица в деле
+    Classification of the role of the person in the case
     
     Args:
-        case_number: Номер дела
-        act_text: Текст судебного акта
-        query: Поисковый запрос (ФИО/ИНН/наименование)
+        case_number: Case number
+        act_text: Text of the judicial act
+        query: Search request (FIO/INN/name)
     
     Returns:
-        Словарь с классификацией роли
+        Vocabulary with Classification of Role
     """
     try:
-        system_prompt = """Ты - эксперт по классификации участников судебных процессов. Твоя задача - точно определять роли лиц в судебных делах.
+        system_prompt = 'You\'re an expert in the classification of participants in trials. Your job is to determine exactly the role of individuals in court cases.\n\nDetermine the type of reference to the person/organization in the court case. Possible types according to TK:\n- ""participant" - person is a party to the case (claimer, defendant, third person, creditor, debtor))\n- "the person mentioned" - the person is mentioned in the text of the act but is not a party to the case\n- "counterparty" - person is a party to the contract or transaction referred to in the case\n- "Affiliated person" - person connected to a party (founder, manager, company related)\n\nClassification rules:\n1. If the person is a party to the case (party, third party), return the "participant""\n2. If a person is mentioned in the text but is not a party, return the "named person""\n3. If a person is referred to as a party to a contract/transaction, return the "contractor""\n4. If the person is connected to the participant (founder, director, etc.), return the "affiliated person""\n\nYou have to return the result in the JSON format. JSON Structure:\n{\n    "classification": "name_Type",\n    "confidence": number_from_0_up to_1,\n    "reasoning": "Brief rationale for classification"\n}\n\nIf reference is not found in the text, return:\n{\n    "classification": "not found",\n    "confidence": 0.0,\n    "reasoning": "No reference found in the text"\n}'
 
-Определи тип упоминания указанного лица/организации в судебном деле. Возможные типы согласно ТЗ:
-- "участник" - лицо является стороной дела (истец, ответчик, третье лицо, кредитор, должник)
-- "упомянутое лицо" - лицо упоминается в тексте акта, но не является участником дела
-- "контрагент" - лицо является стороной договора или сделки, упомянутой в деле
-- "аффилированное лицо" - лицо связано с участником дела (учредитель, руководитель, связанная компания)
-
-Правила классификации:
-1. Если лицо является участником дела (сторона, третье лицо) - верни "участник"
-2. Если лицо упоминается в тексте, но НЕ является участником - верни "упомянутое лицо"
-3. Если лицо упоминается как сторона договора/сделки - верни "контрагент"
-4. Если лицо связано с участником (учредитель, руководитель и т.д.) - верни "аффилированное лицо"
-
-ВАЖНО: Ты должен вернуть результат в формате JSON объекта. Структура JSON:
-{
-    "classification": "название_типа",
-    "confidence": число_от_0_до_1,
-    "reasoning": "краткое обоснование классификации"
-}
-
-Если упоминание не найдено в тексте, верни:
-{
-    "classification": "не найдено",
-    "confidence": 0.0,
-    "reasoning": "Упоминание не обнаружено в тексте"
-}"""
-
-        user_prompt = f"""Текст судебного акта:
+        user_prompt = f"""Text of the judicial act:
 {act_text}
 
-Классифицируй роль: {query}"""
+Classify the role: {query}"""
 
         import asyncio
         
         async def get_response():
-            logger.info(f"[CLASSIFICATION] Запрос к OpenAI для дела {case_number}, query={query}")
-            logger.info(f"[CLASSIFICATION] Длина act_text: {len(act_text) if act_text else 0}")
+            logger.info(f"[CLASSIFICATION] Request OpenAI for case {case_number}, query={query}")
+            logger.info(f"The length of act_text: {len(act_text) if act_text else 0}")
             if act_text:
-                logger.info(f"[CLASSIFICATION] Первые 500 символов act_text: {act_text[:500]}")
+                logger.info(f"First 500 act_text characters: {act_text[:500]}")
             else:
-                logger.warning(f"[CLASSIFICATION] act_text ПУСТОЙ для дела {case_number}!")
+                logger.warning(f"[CLASSIFICATION] act_text WAY FOR THE PROCESS {case_number}!")
             
             response = await _get_client().chat.completions.create(
                 model="gpt-5-nano",
@@ -98,7 +72,7 @@ def classify_mention(case_number: str, act_text: str, query: str) -> dict:
                 response_format={"type": "json_object"}
             )
             response_text = response.choices[0].message.content
-            logger.info(f"[CLASSIFICATION] Ответ от OpenAI (первые 500 символов): {response_text[:500] if response_text else 'EMPTY'}")
+            logger.info(f"[CLASSIFICATION] Response from OpenAI (first 500 characters): {response_text[:500] if response_text else 'EMPTY'}")
             return response_text
         
         try:
@@ -113,14 +87,14 @@ def classify_mention(case_number: str, act_text: str, query: str) -> dict:
             return {
                 "classification": "не определено",
                 "confidence": 0.0,
-                "reasoning": "Пустой ответ от LLM"
+                "reasoning": 'An empty answer from LLM'
             }
         
-        # GPT-5 с response_format={"type": "json_object"} возвращает чистый JSON
-        # Но на всякий случай очищаем от возможных markdown блоков
+        # GPT-5 with response_format={"type": "json_object"} returns pure JSON
+        # But just in case we're cleaning up possible markdown blocks
         cleaned_text = response_text.strip()
         
-        # Убираем markdown code blocks если есть (на случай если модель все же вернула)
+        # Take out the Markdown code blocks if there is (in case the model did return it))
         if "```" in cleaned_text:
             import re
             json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', cleaned_text, re.DOTALL)
@@ -133,7 +107,7 @@ def classify_mention(case_number: str, act_text: str, query: str) -> dict:
                     if cleaned_text.startswith("json"):
                         cleaned_text = cleaned_text[4:].strip()
         
-        # Пытаемся найти JSON объект в тексте (на случай если есть лишний текст)
+        # Trying to find JSON object in the text (in case there's an extra text))
         json_start = cleaned_text.find("{")
         json_end = cleaned_text.rfind("}")
         if json_start != -1 and json_end != -1 and json_end > json_start:
@@ -141,31 +115,31 @@ def classify_mention(case_number: str, act_text: str, query: str) -> dict:
         
         try:
             result = json.loads(cleaned_text)
-            logger.info(f"[CLASSIFICATION] Успешно распарсен JSON для дела {case_number}: {result}")
+            logger.info(f"[CLASSIFICATION] Successfully unsold by JSON for a case {case_number}: {result}")
             
-            # Проверяем, что классификация валидна
+            # Check that the classification is valid.
             classification = result.get("classification", "")
             if not classification or classification == "не найдено":
-                # Проверяем, действительно ли query есть в тексте
+                # Check if there's really a query in the text.
                 if query.lower() in act_text.lower() if act_text else False:
-                    # Query есть в тексте, но LLM не нашел - используем fallback
-                    logger.warning(f"[CLASSIFICATION] LLM не нашел классификацию для дела {case_number}, но query есть в тексте. Используем fallback.")
+                    # Query's in the text, but LLM didn't find-- use fallsback
+                    logger.warning(f"LLM did not find a classification for the case {case_number}, But query is in the text. We're gonna use a fallback.")
                     result["classification"] = "упомянутое лицо"
                     result["confidence"] = 0.5
-                    result["reasoning"] = "Упоминание найдено в тексте, но LLM не определил роль"
+                    result["reasoning"] = 'Reference found in the text, but LLM did not define the role'
             
             return result
         except json.JSONDecodeError as e:
-            # Пытаемся извлечь классификацию из текста согласно ТЗ
+            # We are trying to extract classification from the text according to TZ
             response_lower = response_text.lower() if response_text else ""
-            classification = "упомянутое лицо"  # По умолчанию, если не участник
+            classification = "упомянутое лицо"  # By default, if not a participant
             
-            # Проверяем по приоритету согласно ТЗ
-            if any(word in response_lower for word in ["участник", "сторона", "истец", "ответчик", "третье лицо", "кредитор", "должник"]):
+            # Checking for priority according to TK
+            if any(word in response_lower for word in ["участник", 'party', "истец", "ответчик", "третье лицо", "кредитор", "должник"]):
                 classification = "участник"
             elif "контрагент" in response_lower or "договор" in response_lower or "сделка" in response_lower:
                 classification = "контрагент"
-            elif any(word in response_lower for word in ["аффилирован", "учредитель", "руководитель", "связан"]):
+            elif any(word in response_lower for word in ['Affiliated', 'Founder', 'Head', 'Affiliated']):
                 classification = "аффилированное лицо"
             elif "упомянут" in response_lower or "упоминается" in response_lower:
                 classification = "упомянутое лицо"
@@ -173,13 +147,13 @@ def classify_mention(case_number: str, act_text: str, query: str) -> dict:
             return {
                 "classification": classification,
                 "confidence": 0.6,
-                "reasoning": response_text[:200] if response_text else "Классификация выполнена"
+                "reasoning": response_text[:200] if response_text else 'Classification implemented'
             }
             
     except Exception as e:
-        logger.error(f"[CLASSIFICATION] Ошибка для дела {case_number}: {e}", exc_info=True)
+        logger.error(f"[Classification: Error to the business {case_number}: {e}", exc_info=True)
         return {
             "classification": "не определено",
             "confidence": 0.0,
-            "reasoning": f"Ошибка при классификации: {str(e)}"
+            "reasoning": f"Error in classification: {str(e)}"
         }

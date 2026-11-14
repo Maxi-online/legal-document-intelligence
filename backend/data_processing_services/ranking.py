@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-# Добавляем путь к backend для импорта utils
+# Add a path to backend for the import of utils
 backend_path = str(Path(__file__).parent.parent.parent)
 if backend_path not in sys.path:
     sys.path.insert(0, backend_path)
@@ -27,46 +27,46 @@ def _get_client():
 @app.task
 def rank_relevance(case_number: str, act_text: str, query: str) -> dict:
     """
-    Ранжирование релевантности упоминания
+    Rating the relevance of the reference
     
     Args:
-        case_number: Номер дела
-        act_text: Текст судебного акта
-        query: Поисковый запрос (ФИО/ИНН/наименование)
+        case_number: Case number
+        act_text: Text of the judicial act
+        query: Search request (FIO/INN/name)
     
     Returns:
-        Словарь с оценкой релевантности
+        A dictionary assessing relevance
     """
     try:
-        # Подсчитываем частоту упоминаний
+        # Compute the frequency of references
         mentions_count = len(re.findall(re.escape(query), act_text, re.IGNORECASE))
         
-        prompt = f"""Оцени релевантность упоминания "{query}" в следующем судебном акте.
+        prompt = f"""Assess the relevance of the reference to \"{query}And in the next court act.
 
-Текст судебного акта:
+Text of the judicial act:
 {act_text}
 
-Количество упоминаний "{query}": {mentions_count}
+Number of references \"{query}": {mentions_count}
 
-Оцени релевантность по следующим критериям:
-1. Частота упоминаний (больше упоминаний = выше релевантность)
-2. Важность роли в деле (истец/ответчик важнее свидетеля)
-3. Ключевые моменты упоминания (участие в решениях, наличие обязательств и т.д.)
-4. Актуальность упоминания для поискового запроса
+Assess relevance by the following criteria:
+1. Frequency of references (more references = above relevance)
+2. The importance of the role in the case (the plaintiff/defendant is more important than the witness))
+3. Key points of reference (participation in decisions, existence of obligations, etc.).)
+4. Relevance of reference for search request
 
-Верни результат в формате JSON:
+Return the result to JSON:
 {{
-    "relevance_score": число_от_0_до_1,
-    "factors": {{
-        "mention_frequency": число,
-        "role_importance": число_от_0_до_1,
-        "context_importance": число_от_0_до_1,
-        "overall_relevance": число_от_0_до_1
+    \"relevance_score\": number_from_0_up to_1,
+    \"factors\": {{
+        \"mention_frequency\": number,
+        \"role_importance\": number_from_0_up to_1,
+        \"context_importance\": number_from_0_up to_1,
+        \"overall_relevance\": number_from_0_up to_1
     }},
-    "explanation": "краткое объяснение оценки"
+    \"explanation\": \"Summary explanation of the valuation\"
 }}
 
-Если "{query}" не найден в тексте, верни:
+If \"{query}\"not found in the text, give it back:
 {{
     "relevance_score": 0.0,
     "factors": {{
@@ -75,7 +75,7 @@ def rank_relevance(case_number: str, act_text: str, query: str) -> dict:
         "context_importance": 0.0,
         "overall_relevance": 0.0
     }},
-    "explanation": "Упоминание не найдено"
+    \"explanation\": \"No reference found\"
 }}
 """
 
@@ -85,7 +85,7 @@ def rank_relevance(case_number: str, act_text: str, query: str) -> dict:
             response = await _get_client().chat.completions.create(
                 model="gpt-5-nano",
                 messages=[
-                    {"role": "system", "content": "Ты - эксперт по оценке релевантности документов. Твоя задача - точно оценивать важность упоминаний в судебных актах."},
+                    {"role": "system", "content": "You're an expert on the relevance of documents. Your job is to accurately assess the importance of mentioning in court acts."},
                     {"role": "user", "content": prompt}
                 ],
                 response_format={"type": "json_object"}
@@ -104,7 +104,7 @@ def rank_relevance(case_number: str, act_text: str, query: str) -> dict:
             result = json.loads(response_text)
             return result
         except json.JSONDecodeError:
-            # Вычисляем базовую оценку на основе частоты упоминаний
+            # Compute a baseline estimate based on frequency of references
             base_score = min(mentions_count / 10, 1.0) if mentions_count > 0 else 0.0
             
             return {
@@ -115,12 +115,12 @@ def rank_relevance(case_number: str, act_text: str, query: str) -> dict:
                     "context_importance": 0.5,
                     "overall_relevance": base_score
                 },
-                "explanation": f"Оценка основана на частоте упоминаний: {mentions_count}"
+                "explanation": f"The evaluation is based on the frequency of references: {mentions_count}"
             }
             
     except Exception as e:
         print(f"Error in ranking: {e}")
-        # Базовая оценка на основе частоты упоминаний
+        # Baseline evaluation based on frequency of references
         mentions_count = len(re.findall(re.escape(query), act_text, re.IGNORECASE)) if act_text else 0
         base_score = min(mentions_count / 10, 1.0) if mentions_count > 0 else 0.0
         
@@ -132,5 +132,5 @@ def rank_relevance(case_number: str, act_text: str, query: str) -> dict:
                 "context_importance": 0.5,
                 "overall_relevance": base_score
             },
-            "explanation": f"Ошибка при ранжировании: {str(e)}"
+            "explanation": f"Error in ranking: {str(e)}"
         }

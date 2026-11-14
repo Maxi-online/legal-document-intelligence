@@ -1,39 +1,39 @@
 {
   "side_types": {
-    "plaintiff": "истец",
-    "creditor": "кредитор",
-    "defendant": "ответчик",
-    "debtor": "должник",
-    "thirdPerson": "третье лицо",
-    "other": "иное лицо",
-    "all": "все"
+    "plaintiff": "Claimant",
+    "creditor": "Creditor",
+    "defendant": "respondent",
+    "debtor": "debtor",
+    "thirdPerson": "third person",
+    "other": "Other person",
+    "all": "All"
   },
   "case_states": {
-    "opened": "В производстве",
-    "canAppeal": "Возможно обжалование",
-    "canRestoreAppeal": "Возможно восстановление срока обжалования",
-    "finished": "Завершено"
+    "opened": "In production",
+    "canAppeal": "An appeal is possible.",
+    "canRestoreAppeal": "Re-establishment of the appeal period is possible",
+    "finished": "Completed"
   },
   "case_type_codes": {
-    "administrative": "Административные",
-    "civil": "Гражданские",
-    "bankrupt": "Банкротство юридических лиц и индивидуальных предпринимателей",
-    "fact": "Об установлении фактов, имеющих юридическое значение",
-    "foreign": "О признании и приведении в исполнение решений иностранных судов и иностранных арбитражных решений",
-    "commercialArbitrage": "Об оспаривании решений третейских судов и о выдаче исполнительных листов на принудительное исполнение решений третейских судов",
-    "bankruptCitizen": "Банкротство граждан"
+    "administrative": "Administrative",
+    "civil": "Civilian",
+    "bankrupt": "Bankruptcy of legal persons and individual entrepreneurs",
+    "fact": "On the establishment of facts of legal significance",
+    "foreign": "Recognition and enforcement of foreign court decisions and foreign arbitral awards",
+    "commercialArbitrage": "On the contestation of the decisions of the treaty courts and on the issuance of executive lists for the compulsory enforcement of the decisions of treaty courts",
+    "bankruptCitizen": "Bankruptcy of citizens"
   },
   "classification_types": {
-    "участник": "Участник дела",
-    "упомянутое лицо": "Упомянутое лицо",
-    "контрагент": "Контрагент",
-    "аффилированное лицо": "Аффилированное лицо",
-    "истец": "Истец",
-    "ответчик": "Ответчик",
-    "третье лицо": "Третье лицо",
-    "кредитор": "Кредитор",
-    "должник": "Должник",
-    "не найдено": "Не найдено",
-    "не определено": "Не определено"
+    "участник": "Case participant",
+    "упомянутое лицо": "The person in question",
+    "контрагент": "Contractor",
+    "аффилированное лицо": "Affiliated person",
+    "истец": "The plaintiff",
+    "ответчик": "Defendant",
+    "третье лицо": "Third person",
+    "кредитор": "Creditor",
+    "должник": "Debtor",
+    "не найдено": "Not found",
+    "не определено": "Undefined"
   }
 }

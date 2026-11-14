@@ -16,7 +16,7 @@ from pathlib import Path
 
 load_dotenv()
 
-# Конфигурация Celery
+# Celery configuration
 redis_url = os.getenv("REDIS_URL", "")
 broker_url = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 result_backend = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/0")
@@ -29,7 +29,7 @@ app = Celery(
 
 app.config_from_object('celeryconfig')
 
-# Настраиваем логирование
+# Adjusting Login
 logger = logging.getLogger(__name__)
 if not logger.handlers:
     handler = logging.StreamHandler()
@@ -42,8 +42,8 @@ def _safe_str(v) -> str:
 
 def _quick_score(case_data: dict, query: str) -> float:
     """
-    Быстрый скоринг без LLM: частота упоминаний + бонус за свежесть + бонус за явную роль из API.
-    Нужен для top-N отбора, чтобы уложиться в SLA.
+    Rapid Sorting Without LLM: Frequency of Reference + Bonus for Freshness + Bonus of API Explicit Role.
+    Need top-N to fit into the SLA.
     """
     text = _safe_str(case_data.get("act_text", ""))
     api_context = _safe_str(case_data.get("context", ""))
@@ -62,33 +62,33 @@ def _quick_score(case_data: dict, query: str) -> float:
     role_bonus = 0.0
     if any(k in role for k in ("истец", "ответчик")):
         role_bonus = 0.35
-    elif any(k in role for k in ("участник", "треть", "контрагент")):
+    elif any(k in role for k in ("участник", 'one third', "контрагент")):
         role_bonus = 0.2
 
-    # Свежесть (если date в ISO/ YYYY-MM-DD)
+    # Fresh (if data in ISO/YYYY-MM-DD)
     recency_bonus = 0.0
     date_str = _safe_str(case_data.get("date", ""))
     try:
         d = datetime.fromisoformat(date_str.replace("Z", "+00:00")) if date_str else None
         if d:
             days = (datetime.now(d.tzinfo) - d).days if d.tzinfo else (datetime.now() - d).days
-            # чем меньше дней, тем выше бонус (до ~0.25)
+            # The shorter the days, the higher the bonus (to ~0.25)
             recency_bonus = max(0.0, min(0.25, 0.25 * (1.0 - (days / 3650.0))))
     except Exception:
         recency_bonus = 0.0
 
-    # Нормируем частоту: 1 упоминание ~0.15, 5+ ~0.6
+    # Normalized frequency: 1 reference ~0.15, 5+ ~0.6
     freq_score = min(mentions / 8.0, 1.0) * 0.6
     return min(1.0, freq_score + role_bonus + recency_bonus)
 
 def _tokenize(text: str) -> list[str]:
-    # простая токенизация для RU/EN + цифры (ИНН/ОГРН)
+    # simple currenting for RU/EN + digits (INN/DWP)
     return re.findall(r"[a-zа-яё0-9]+", (text or "").lower(), flags=re.IGNORECASE)
 
 def _bm25_scores(docs: list[str], query: str, k1: float = 1.2, b: float = 0.75) -> list[float]:
     """
-    Okapi BM25 для небольшого набора документов (кандидаты из API).
-    Возвращает score на документ.
+    Okapi BM25 for a small set of documents (API candidates)).
+    Returns score to document.
     """
     tokenized_docs = [_tokenize(d) for d in docs]
     N = len(tokenized_docs) or 1
@@ -151,9 +151,9 @@ def _cosine(a: list[float], b: list[float]) -> float:
     return dot / (math.sqrt(na) * math.sqrt(nb))
 
 _EMBED_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-_EMBED_TTL = int(os.getenv("EMBEDDING_TTL_SECONDS", "604800"))  # 7 суток
+_EMBED_TTL = int(os.getenv("EMBEDDING_TTL_SECONDS", "604800"))  # 7 days
 
-# Импортируем apply_openai_proxy_env из backend/utils.py (без жёстких зависимостей на пакетную структуру)
+# Import apply_openai_proxy_env from Backend/utils.py (without rigid dependence on the package structure))
 _backend_path = str(Path(__file__).parent.parent)  # .../backend
 if _backend_path not in sys.path:
     sys.path.insert(0, _backend_path)
@@ -177,8 +177,8 @@ from utils import get_openai_api_key, apply_openai_proxy_env
 
 def _get_embedding(text: str) -> Optional[List[float]]:
     """
-    Берём эмбеддинг из Redis кэша, иначе считаем через OpenAI embeddings API.
-    Если ключа нет — возвращаем None (падаем на BM25-only).
+    We take embeddings from Redis cash, otherwise we count through OpenAI embeddings API.
+    If there's no key, let's return the None.
     """
     api_key = get_openai_api_key()
     if not api_key:
@@ -214,25 +214,25 @@ def _get_embedding(text: str) -> Optional[List[float]]:
 @app.task
 def process_case_data(case_data: dict, query: str):
     """
-    Обработка данных одного дела
+    Processing of one case
     """
     case_number = case_data.get("case_number", "")
     act_text = case_data.get("act_text", "")
     
     act_text_len = len(act_text) if act_text else 0
-    logger.info(f"[PROCESS_CASE_DATA] Обработка дела {case_number}, query={query}")
-    logger.info(f"[PROCESS_CASE_DATA] act_text присутствует: {bool(act_text)}, длина: {act_text_len} символов")
+    logger.info(f"[PROCESS_CASE_DATA] Case processing {case_number}, query={query}")
+    logger.info(f"[PROCESS_CASE_DATA] act_text is present: {bool(act_text)}, length: {act_text_len} Symbols")
     if act_text:
-        logger.info(f"[PROCESS_CASE_DATA] Первые 300 символов act_text: {act_text[:300]}")
-        logger.info(f"[PROCESS_CASE_DATA] Последние 300 символов act_text: {act_text[-300:]}")
+        logger.info(f"[PROCESS_CASE_DATA] The first 300 act_text characters: {act_text[:300]}")
+        logger.info(f"[PROCESS_CASE_DATA] The last 300 act_text characters: {act_text[-300:]}")
         if act_text_len < 100:
-            logger.error(f"[PROCESS_CASE_DATA] КРИТИЧНО: act_text слишком короткий ({act_text_len} символов)! LLM не сможет обработать!")
+            logger.error(f"[PROCESS_CASE_DATA] CRITICAL: act_text too short ({act_text_len} Symbols)! LLM will not be able to process!")
     else:
-        logger.error(f"[PROCESS_CASE_DATA] КРИТИЧНО: act_text ПУСТОЙ для дела {case_number}!")
+        logger.error(f"[PROCESS_CASE_DATA] CRITICAL: act_text WAY FOR A PROJECT {case_number}!")
     
-    # ВАЖНО: не запускаем вложенные Celery group/.get() внутри Celery worker.
-    # Это частая причина дедлоков и таймаутов.
-    # Вместо этого выполняем агентов локально (параллельно в потоках, т.к. операции I/O-bound).
+    # IMPORTANT: Do not launch the Celely group/.get() input within Celery workinger.
+    # It's a common cause of grandfathers and timeouts.
+    # Instead, agents are performed locally (parallel in flows, as operations I/O-bound)).
     with ThreadPoolExecutor(max_workers=2) as executor:
         f_context = executor.submit(extract_context, case_number, act_text, query)
         f_classification = executor.submit(classify_mention, case_number, act_text, query)
@@ -243,47 +243,47 @@ def process_case_data(case_data: dict, query: str):
         logger.info(f"[PROCESS_CASE_DATA] context_result: {context_result}")
         logger.info(f"[PROCESS_CASE_DATA] classification_result: {classification_result}")
     
-    # Объединяем результаты
-    # Собираем итоговую запись.
-    # По ТЗ пользователю нужен контекст (фрагмент) + метаданные + ссылка, а не весь текст акта.
+    # Uniting results
+    # Assemble the final record.
+    # For TK, the user needs context (fragment) + metadata + reference rather than the entire text of the act.
     processed_case = {**case_data}
-    processed_case.pop("act_text", None)  # не тащим полный текст дальше (БД/кэш/экспорт)
+    processed_case.pop("act_text", None)  # Not moving on to the full text (database/kash/export)
 
-    # Определяем финальный тип упоминания:
-    # 1. Если есть классификация от LLM - используем её
-    # 2. Если нет, но есть type_of_mention из API - переводим и используем
-    # 3. Иначе - "упомянутое лицо" (по умолчанию)
+    # Determine the final type of reference:
+    # 1. If there's a classification from LLM, use it
+    # 2. If not, but there is type_of_mention from API - translate and use
+    # 3. Otherwise, "named person" (by default))
     final_classification = classification_result.get("classification", "")
     api_type = case_data.get("type_of_mention", "")
     
-    # Если LLM вернул "не найдено" или пусто, но есть тип из API - используем перевод
+    # If LLM returned "not found" or empty, but there's a type from the API - use translation
     if (not final_classification or final_classification == "не найдено") and api_type:
-        # Переводим тип из API на русский
+        # We're going to transfer the type from API to Russian.
         type_translations = {
             "plaintiff": "истец",
             "creditor": "кредитор", 
             "defendant": "ответчик",
             "debtor": "должник",
             "thirdPerson": "третье лицо",
-            "other": "иное лицо"
+            "other": 'Other person'
         }
-        # Берем первый тип из списка (если несколько через запятую)
+        # Take the first type from the list)
         api_type_clean = api_type.split(',')[0].strip()
         final_classification = type_translations.get(api_type_clean, "участник")
     
-    # Если всё ещё нет классификации - используем "упомянутое лицо" по умолчанию
+    # If there is still no classification, use the default "named face"
     if not final_classification or final_classification == "не найдено":
         final_classification = "упомянутое лицо"
 
     processed_case.update({
         "context": context_result.get("full_context") or context_result.get("context", ""),
         "mentions_count": context_result.get("mentions_count", processed_case.get("metadata", {}).get("mentions_count", 0)),
-        "classification": final_classification,  # Используем финальную классификацию с учетом API и LLM
+        "classification": final_classification,  # Use the final classification for API and LLM
         "classification_confidence": classification_result.get("confidence", 0.0),
-        # relevance_score теперь задаём гибридом BM25+embeddings на уровне батча (см. process_batch)
+        # relevance_score is now given a BM25+embeddings hybrid at the batch level (see process_batch))
         "relevance_score": float(case_data.get("_hybrid_score", case_data.get("relevance_score", 0.0)) or 0.0),
         "extraction_confidence": context_result.get("confidence", 0.0),
-        "type_of_mention": api_type,  # Сохраняем оригинальный тип из API для справки
+        "type_of_mention": api_type,  # Save the original type from the API for reference.
     })
     
     return processed_case
@@ -291,17 +291,17 @@ def process_case_data(case_data: dict, query: str):
 @app.task
 def process_batch(cases: list, query: str):
     """
-    Параллельная обработка батча дел через Celery
+    Parallel processing of case boots via Celery
     """
-    # Top-N стратегия: быстрый скоринг для всех, LLM только для top-N.
-    # Это снижает стоимость и резко улучшает время ответа (ТЗ: ≤ 15s).
-    # Для демо/прод-сценария по умолчанию держим top-N небольшим:
-    # иначе даже при 89 кейсах и медленном прокси обработка может занять 10+ минут,
-    # и upstream (HTTP) будет казаться "вечным".
+    # Top-N strategy: Fast Sorting for All, LLM for Top-N only.
+    # This reduces cost and dramatically improves response time (TH: ≤ 15s)).
+    # For default demo/prod script, hold top-N small:
+    # Otherwise, even at 89 briefcases and slow proxies, processing can take 10 plus minutes,
+    # and upstream (HTTP) would appear to be "perpetual".
     top_n = int(os.getenv("LLM_TOP_N", "5"))
     top_n = max(0, min(top_n, len(cases)))
 
-    # 1) BM25 по всем кандидатам (очень дёшево)
+    # 1) BM25 for all candidates (very cheap)
     doc_texts = []
     for c in cases:
         parts = [
@@ -317,8 +317,8 @@ def process_batch(cases: list, query: str):
     bm25_raw = _bm25_scores(doc_texts, query)
     bm25 = _minmax_norm(bm25_raw)
 
-    # 2) Embeddings на top-M по BM25 (ограничиваем стоимость)
-    # Эмбеддинги — дорого в холодном кэше. По умолчанию ограничиваем.
+    # (2) Embeddings on top-M on BM25 (limit value)
+    # Embeddings – expensive in cold cash. By default limit.
     top_m = int(os.getenv("EMBED_TOP_M", "40"))
     top_m = max(0, min(top_m, len(cases)))
 
@@ -331,22 +331,22 @@ def process_batch(cases: list, query: str):
         for i in idx_top_m:
             e = _get_embedding(doc_texts[i])
             if e:
-                # cosine в [-1..1], приводим к [0..1]
+                # cosine in [1.1] to [0.1]
                 emb_sim[i] = (_cosine(query_emb, e) + 1.0) / 2.0
 
-    # 3) Комбинация (веса можно тюнить)
+    # (3) Combination (weight can be sealed)
     w_bm25 = float(os.getenv("WEIGHT_BM25", "0.55"))
     w_emb = float(os.getenv("WEIGHT_EMB", "0.45"))
     base = []
     for i in range(len(cases)):
-        # лёгкие эвристики как tie-breaker
+        # Light Heuristics as Tie-breaker
         heur = _quick_score(cases[i], query) * 0.15
         score = (bm25[i] * w_bm25) + (emb_sim[i] * w_emb) + heur
         score = max(0.0, min(1.0, score))
         cases[i]["_hybrid_score"] = score
         base.append(score)
 
-    # Выбираем top-N для LLM по гибридному score
+    # Select top-N for LLM on hybrid score
     idx_sorted2 = sorted(range(len(cases)), key=lambda i: base[i], reverse=True)
     idx_top_n = set(idx_sorted2[:top_n])
     top_cases = [cases[i] for i in idx_sorted2[:top_n]]
@@ -354,11 +354,11 @@ def process_batch(cases: list, query: str):
 
     results = []
 
-    # LLM-обработка для top-N
-    # ВАЖНО: если обрабатывать top-N последовательно, общая задержка становится N * (latency LLM),
-    # что легко превращается в 10-15 минут при прокси/ретраях.
-    # Поэтому делаем параллельную обработку по кейсам (I/O-bound) через пул потоков.
-    # Дефолт для демо: 8 параллельных кейсов (можно переопределить env LLM_MAX_WORKERS)
+    # LLM processing for top-N
+    # IMPORTANT: If you process top-N in sequence, the total delay becomes N * (latecy LLM)),
+    # which easily turns into 10-15 minutes with proxies/retrays.
+    # So let's do parallel case processing (I/O-bound) through the flow pool.
+    # Defolt for demo: 8 parallel briefcases (can be redefined env LLM_MAX_WORKERS)
     llm_workers = int(os.getenv("LLM_MAX_WORKERS", "8"))
     llm_workers = max(1, min(llm_workers, max(1, len(top_cases))))
     if top_cases:
@@ -368,17 +368,17 @@ def process_batch(cases: list, query: str):
                 try:
                     results.append(f.result())
                 except Exception:
-                    # fallback: если один кейс упал, всё равно продолжаем
+                    # fallback: If one case fell, we'll continue anyway.
                     results.append(process_case_data({}, query))
 
-    # Остальные — без LLM: используем то, что уже пришло от API + быстрый score
+    # The rest are without LLM: use what's already come from API + fast score
     for case in tail_cases:
         processed_case = {**case}
         processed_case.pop("act_text", None)
         processed_case.update({
             "context": processed_case.get("context", ""),
             "mentions_count": processed_case.get("metadata", {}).get("mentions_count", 0),
-            "classification": processed_case.get("type_of_mention", "") or "упоминание",
+            "classification": processed_case.get("type_of_mention", "") or 'Reference',
             "classification_confidence": 0.0,
             "relevance_score": float(case.get("_hybrid_score", 0.0) or 0.0),
             "extraction_confidence": 0.0,
